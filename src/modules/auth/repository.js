@@ -16,6 +16,7 @@ const createUserInTransaction = async (tx, data) => {
   return await tx.user.create({ data });
 };
 
+
 const runTransaction = (callback) => {
   return prisma.$transaction(callback);
 };

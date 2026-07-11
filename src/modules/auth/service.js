@@ -21,7 +21,7 @@ const registerUser = async ({ name, email, password, companyName }) => {
       password: hashedPassword,
     });
 
-    const compnay = await companyService.createCompany(tx, {
+    const company = await companyService.createCompany(tx, {
       companyName,
       userId: user.id,
       ownerRoleId: onwerRole.id,

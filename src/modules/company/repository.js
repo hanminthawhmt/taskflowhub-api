@@ -4,7 +4,7 @@ const createCompanyAsOwner = async (
   tx,
   { companyName, userId, ownerRoleId },
 ) => {
-  const company = tx.company.create({
+  const company = await tx.company.create({
     data: {
       name: companyName,
       createdBy: userId,
