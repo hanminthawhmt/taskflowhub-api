@@ -12,6 +12,14 @@ const findByEmail = async (email) => {
   return user;
 };
 
+const createUserInTransaction = async (tx, data) => {
+  return await tx.user.create({ data });
+};
+
+const runTransaction = (callback) => {
+  return prisma.$transaction(callback);
+};
+
 const getAllUsers = async () => {
   const users = await prisma.user.findMany();
   return users;
@@ -41,6 +49,8 @@ const deleteUserById = async (id) => {
 module.exports = {
   createUser,
   findByEmail,
+  createUserInTransaction,
+  runTransaction,
   getAllUsers,
   getUserById,
   updateUserById,
