@@ -5,6 +5,13 @@ const createUser = async (data) => {
   return user;
 };
 
+const findByEmail = async (email) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  return user;
+};
+
 const getAllUsers = async () => {
   const users = await prisma.user.findMany();
   return users;
@@ -32,9 +39,10 @@ const deleteUserById = async (id) => {
 };
 
 module.exports = {
-    createUser,
-    getAllUsers,
-    getUserById,
-    updateUserById,
-    deleteUserById
-}
+  createUser,
+  findByEmail,
+  getAllUsers,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+};

@@ -5,7 +5,7 @@ const handleCreateUser = async (req, res, next) => {
     const user = await userService.createUser(req.body);
     return res.status(201).json({
       success: true,
-      data: author,
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -19,7 +19,15 @@ const handleLogIn = async (req, res, next) => {
 
 const handleRegister = async (req, res, next) => {
   try {
-  } catch (error) {}
+    const { user, token } = await userService.registerUser(req.body);
+    res.status(201).json({
+      message: "User Registered",
+      user,
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const handleGetUserById = async (req, res, next) => {
