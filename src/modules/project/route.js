@@ -7,7 +7,7 @@ const express = require("express");
 const router = express.Router();
 
 router.post(
-  "/companies/:companyId",
+  "/:companyId/projects",
   authenticate,
   checkCompanyMember,
   validate(projectValidation.createProjectSchema),

@@ -3,7 +3,7 @@ const AppError = require("../util/appError");
 
 const checkCompanyMember = async (req, res, next) => {
   try {
-    const { companyId } = req.params;
+    const companyId  = Number(req.params.companyId);
     const userId = req.user.userId;
 
     const membership = await prisma.companyMember.findFirst({

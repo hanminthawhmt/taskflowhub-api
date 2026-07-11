@@ -3,6 +3,6 @@ const projectRoutes = require('../modules/project/route');
 const router = require('express').Router();
 
 router.use('/auth', authRoutes);
-router.use('/projects', projectRoutes);
+router.use('/companies', projectRoutes);
 
 module.exports = router;
