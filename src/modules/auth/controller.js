@@ -14,7 +14,15 @@ const handleCreateUser = async (req, res, next) => {
 
 const handleLogIn = async (req, res, next) => {
   try {
-  } catch (error) {}
+    const { user, token } = await userService.loginUser(req.body);
+    res.status(200).json({
+      message: "Login Successful",
+      data: user,
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const handleRegister = async (req, res, next) => {

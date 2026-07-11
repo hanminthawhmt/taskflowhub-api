@@ -1,6 +1,7 @@
 const userRepo = require("./repository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const AppError = require("../../util/app_error");
 const generateToken = require("../../util/generate_token");
 
 const createUser = async (data) => {
@@ -36,12 +37,29 @@ const registerUser = async ({ name, email, password }) => {
   const user = await userRepo.createUser({
     name,
     email,
-    password,
+    password: hashedPassword,
   });
 
   const token = generateToken(user);
   const { password: _, ...safeUser } = user;
 
+  return {
+    user: safeUser,
+    token,
+  };
+};
+
+const loginUser = async ({ email, password }) => {
+  const user = await userRepo.findByEmail(email);
+  if (!user) {
+    throw new AppError("User does not exist", 401);
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new AppError("Invalid email or password", 401);
+  }
+  const token = generateToken(user);
+  const { password: _, ...safeUser } = user;
   return {
     user: safeUser,
     token,
@@ -55,4 +73,5 @@ module.exports = {
   updateUserById,
   deleteUserById,
   registerUser,
+  loginUser,
 };
