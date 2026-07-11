@@ -1,8 +1,8 @@
 const roleRepo = require("./repository");
-const AppError = require("../../util/app_error");
+const AppError = require("../../util/appError");
 
-const getOwnerRole = async () => {
-  const role = await roleRepo.findRoleByTitleScope("Owner", "company");
+const getOwnerRole = async (scope, title) => {
+  const role = await roleRepo.findRoleByTitleScope(title, scope);
   if (!role) {
     throw new AppError("Owner role not configured", 500);
   }

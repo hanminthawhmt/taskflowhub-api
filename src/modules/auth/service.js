@@ -1,8 +1,8 @@
 const authRepo = require("./repository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const AppError = require("../../util/app_error");
-const generateToken = require("../../util/generate_token");
+const AppError = require("../../util/appError");
+const generateToken = require("../../util/generateToken");
 const roleService = require("../role/service");
 const companyService = require("../company/service");
 
@@ -11,7 +11,7 @@ const registerUser = async ({ name, email, password, companyName }) => {
   if (existingUser) {
     throw new AppError("Email already in use", 409);
   }
-  const onwerRole = await roleService.getOwnerRole();
+  const onwerRole = await roleService.getOwnerRole("Owner", "company");
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const { user, company } = await authRepo.runTransaction(async (tx) => {
