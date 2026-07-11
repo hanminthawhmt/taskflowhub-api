@@ -14,6 +14,7 @@ const checkCompanyMember = async (req, res, next) => {
       return next(new AppError("You are not a member of this company", 403));
     }
     req.companyMembership = membership;
+    next();
   } catch (error) {
     next(error);
   }
