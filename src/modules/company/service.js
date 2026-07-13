@@ -1,5 +1,5 @@
 const companyRepo = require("./repository");
-const sendEmail = require("../../services/mailer");
+const sendMail = require("../../services/mailer");
 const companyInviteTemplate = require("../../services/emailTemplates/companyInvite");
 
 const createCompany = async (tx, { companyName, userId, ownerRoleId }) => {
@@ -27,7 +27,7 @@ const inviteMember = async ({
     });
   });
 
-  const acceptUrl = `${APP_URL}/api/v1/companies/invitations/${invitation.token}/accept`;
+  const acceptUrl = `http://localhost:3000/api/v1/companies/invitations/${invitation.token}/accept`;
 
   await sendMail({
     to: email,
