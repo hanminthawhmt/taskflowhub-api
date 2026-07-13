@@ -1,6 +1,5 @@
 const companyService = require("./service");
 const authService = require("../auth/service");
-const companyService = require("./service");
 
 const handleInviteMember = async (req, res, next) => {
   try {
@@ -22,4 +21,15 @@ const handleInviteMember = async (req, res, next) => {
   }
 };
 
-module.exports = { handleInviteMember };
+const handleGetAllCompanies = async (req, res, next) => {
+  try {
+    const companies = await companyService.getAllCompanies();
+    res.status(200).json({
+      data: companies,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { handleInviteMember, handleGetAllCompanies };

@@ -42,4 +42,13 @@ const findCompanyById = async (id) => {
   return await companyRepo.findCompanyById(id);
 };
 
-module.exports = { createCompany, inviteMember, findCompanyById };
+const getAllCompanies = async () => {
+  return await companyRepo.getAllCompanies();
+};
+
+module.exports = {
+  createCompany,
+  inviteMember,
+  findCompanyById,
+  getAllCompanies,
+};
