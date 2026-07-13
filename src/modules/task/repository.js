@@ -39,9 +39,9 @@ const findMyTasksInProject = async (projectId, userId) => {
   return projects;
 };
 
-const updateStatus = async (taskId, userId) => {
+const updateStatus = (taskId, status) => {
   return prisma.task.update({
-    where: { taskId, userId },
+    where: { id: taskId },
     data: { status },
   });
 };
