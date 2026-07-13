@@ -34,8 +34,28 @@ const createTask = async ({
     if (error instanceof AppError) {
       throw error;
     }
-    throw new AppError(error.message || "Failed to create task", error.statusCode || 500);
+    throw new AppError(
+      error.message || "Failed to create task",
+      error.statusCode || 500,
+    );
   }
 };
 
-module.exports = { createTask };
+const getMyTasks = async ({ projectId, userId }) => {
+  const tasks = await taskRepo.findMyTasksInProject(projectId, userId);
+  return tasks;
+};
+
+const updateStatus = async ({ taskId, userId, status }) => {
+  const task = await taskRepo.findById(taskId);
+  if (!task) {
+    throw new AppError("Task not found", 404);
+  }
+  if (task.userId !== userId) {
+    throw new AppError("You can only update tasks assigned to you", 403);
+  }
+  const updated = await taskRepo.updateStatus(taskId, status);
+  return updated;
+};
+
+module.exports = { createTask, getMyTasks, getMyTasks, updateStatus };

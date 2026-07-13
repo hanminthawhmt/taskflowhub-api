@@ -27,4 +27,23 @@ const createTask = async ({
   return task;
 };
 
-module.exports = { createTask };
+const findById = (taskId) => {
+  return prisma.task.findUnique({ where: { id: taskId } });
+};
+
+const findMyTasksInProject = async (projectId, userId) => {
+  const projects = await prisma.task.findMany({
+    where: { projectId, userId },
+    orderBy: { createdAt: "desc" },
+  });
+  return projects;
+};
+
+const updateStatus = async (taskId, userId) => {
+  return prisma.task.update({
+    where: { taskId, userId },
+    data: { status },
+  });
+};
+
+module.exports = { createTask, findById, findMyTasksInProject, updateStatus };

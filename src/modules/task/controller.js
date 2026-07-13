@@ -23,4 +23,29 @@ const handleTaskCreate = async (req, res, next) => {
   }
 };
 
-module.exports = { handleTaskCreate };
+const handleGetMyTasks = async (req, res, next) => {
+  try {
+    const tasks = await taskService.getMyTasks({
+      projectId: Number(req.params.projectId),
+      userId: req.user.userId,
+    });
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleUpdateTaskStatus = async (req, res, next) => {
+  try {
+    const task = await taskService.updateStatus({
+      taskId: Number(req.params.taskId),
+      userId: req.user.userId,
+      status: req.body.status,
+    });
+    res.status(200).json({ message: "Task status updated", data: task });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { handleTaskCreate, handleGetMyTasks, handleUpdateTaskStatus };

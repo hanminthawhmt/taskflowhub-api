@@ -10,4 +10,8 @@ const createTaskSchema = z.object({
   user_id: z.coerce.number().int().positive().optional(),
 });
 
-module.exports = { createTaskSchema };
+const updateTaskStatusSchema = z.object({
+  status: z.enum(["pending", "complete"]),
+});
+
+module.exports = { createTaskSchema, updateTaskStatusSchema };

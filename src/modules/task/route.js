@@ -16,4 +16,18 @@ router.post(
   taskController.handleTaskCreate,
 );
 
+router.get(
+  "/:projectId/mine",
+  authenticate,
+  checkProjectMember,
+  taskController.handleGetMyTasks,
+);
+
+router.patch(
+  "/:projectId/tasks/:taskId/status",
+  authenticate,
+  checkProjectMember,
+  validate(taskValidation.updateTaskStatusSchema),
+  taskController.handleUpdateTaskStatus,
+);
 module.exports = router;
