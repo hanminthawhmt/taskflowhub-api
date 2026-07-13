@@ -1,3 +1,4 @@
+const prisma = require('../config/db');
 const AppError = require("../util/appError");
 
 const requireSuperAdmin = async (req, res, next) => {
@@ -14,4 +15,4 @@ const requireSuperAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { requireSuperAdmin };
+module.exports =  requireSuperAdmin ;
