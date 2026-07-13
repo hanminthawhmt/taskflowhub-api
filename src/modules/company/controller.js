@@ -1,0 +1,25 @@
+const companyService = require("./service");
+const authService = require("../auth/service");
+const companyService = require("./service");
+
+const handleInviteMember = async (req, res, next) => {
+  try {
+    const inviter = await authService.getUserById(Number(req.user.userId));
+    const company = await companyService.findCompanyById(
+      Number(req.params.companyId),
+    );
+    const invitation = await companyService.inviteMember({
+      companyId: Number(req.params.companyId),
+      email: req.body.email,
+      roleId: req.body.role_id,
+      invitedBy: req.user.userId,
+      companyName: company.name,
+      inviterName: inviter.name,
+    });
+    res.status(201).json({ message: "Invitation sent", data: invitation });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { handleInviteMember };

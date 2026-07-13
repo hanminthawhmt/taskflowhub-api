@@ -57,7 +57,12 @@ const loginUser = async ({ email, password }) => {
   };
 };
 
+const getUserById = async (id) => {
+  return await authRepo.getUserById(id);
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  getUserById
 };

@@ -5,4 +5,9 @@ module.exports = {
   DATABASE_URL: process.env.DATABASE_URL,
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  MAILTRAP_HOST: process.env.MAILTRAP_HOST,
+  MAILTRAP_PORT: process.env.MAILTRAP_PORT,
+  MAILTRAP_USER: process.env.MAILTRAP_USER,
+  MAILTRAP_PASS: process.env.MAILTRAP_PASS,
+  MAIL_FROM: process.env.MAIL_FROM,
 };
