@@ -18,8 +18,12 @@ const handleRegister = async (req, res, next) => {
     const { user, company, token } = await authService.registerUser(req.body);
     res.status(201).json({
       message: "User Registered",
-      user,
-      company,
+      data: [
+        {
+          user: user,
+          company: company,
+        },
+      ],
       token,
     });
   } catch (error) {
