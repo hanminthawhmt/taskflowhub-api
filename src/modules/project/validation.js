@@ -5,4 +5,23 @@ const createProjectSchema = z.object({
   description: z.string().max(2000, "Description is too long").optional(),
 });
 
-module.exports = { createProjectSchema };
+const addProjectMemberSchema = z.preprocess(
+  (data) => {
+    if (Array.isArray(data)) return { members: data };
+    if (data && Array.isArray(data.members)) return data;
+    if (data && typeof data === "object") return { members: [data] };
+    return data;
+  },
+  z.object({
+    members: z
+      .array(
+        z.object({
+          user_id: z.coerce.number().int().positive(),
+          role_id: z.coerce.number().int().positive(),
+        }),
+      )
+      .min(1, "At least one member is required"),
+  }),
+);
+
+module.exports = { createProjectSchema, addProjectMemberSchema };

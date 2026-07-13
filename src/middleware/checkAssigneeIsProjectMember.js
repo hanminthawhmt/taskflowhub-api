@@ -3,7 +3,7 @@ const AppError = require("../util/appError");
 
 const checkAssigneeIsProjectMember = async (req, res, next) => {
   try {
-    const projectId = req.params.projectId;
+    const projectId = Number(req.params.projectId);
     const assigneeId = req.body.user_id;
     const membership = await prisma.projectMember.findFirst({
       where: { projectId, userId: assigneeId },

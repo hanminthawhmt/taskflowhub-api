@@ -17,4 +17,19 @@ const handleCreateProject = async (req, res, next) => {
   }
 };
 
-module.exports = { handleCreateProject };
+const handleAddProjectMembers = async (req, res, next) => {
+  try {
+    const members = await projectService.addProjectMembers({
+      projectId: Number(req.params.projectId),
+      members: req.body.members,
+    });
+    res.status(201).json({
+      message: "Members added successfully",
+      data: members,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { handleCreateProject, handleAddProjectMembers };

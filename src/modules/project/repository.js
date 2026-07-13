@@ -31,8 +31,29 @@ const runTransaction = (callback) => {
   return prisma.$transaction(callback);
 };
 
+const addMembersInTransaction = async (tx, { projectId, members }) => {
+  const data = members.map((m) => ({
+    projectId,
+    userId: m.user_id,
+    roleId: m.role_id,
+  }));
+
+  await tx.projectMember.createMany({
+    data,
+    skipDuplicates: true,
+  });
+
+  return tx.projectMember.findMany({
+    where: {
+      projectId,
+      userId: { in: members.map((m) => m.user_id) },
+    },
+  });
+};
+
 module.exports = {
   createProjectInTransaction,
   addProjectMemberInTransaction,
   runTransaction,
+  addMembersInTransaction,
 };

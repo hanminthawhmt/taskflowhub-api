@@ -25,8 +25,19 @@ const createProject = async ({ company_id, title, description, userId }) => {
 
     return project;
   } catch (error) {
-    throw new AppError(error.message || "Failed to create project", error.statusCode || 500);
+    throw new AppError(
+      error.message || "Failed to create project",
+      error.statusCode || 500,
+    );
   }
 };
 
-module.exports = { createProject };
+const addProjectMembers = async ({ projectId, members }) => {
+  const addedMembers = await projectRepo.runTransaction(async (tx) => {
+    return projectRepo.addMembersInTransaction(tx, { projectId, members });
+  });
+
+  return addedMembers;
+};
+
+module.exports = { createProject, addProjectMembers };
