@@ -5,10 +5,12 @@ const createCompanyAsOwner = async (
   tx,
   { companyName, userId, ownerRoleId },
 ) => {
+  const freePlan = await tx.plan.findUnique({ where: { name: "Free" } });
   const company = await tx.company.create({
     data: {
       name: companyName,
       createdBy: userId,
+      planId: freePlan?.id ?? null,
       subscriptionStatus: "active",
     },
   });
