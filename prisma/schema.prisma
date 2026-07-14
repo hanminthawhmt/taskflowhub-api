@@ -71,7 +71,7 @@ enum RoleScope {
 
 model Permission {
   id        Int      @id @default(autoincrement())
-  name String @unique @db.VarChar(255)
+  name      String   @unique @db.VarChar(255)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -101,6 +101,7 @@ model Company {
   id                 Int       @id @default(autoincrement())
   name               String    @db.VarChar(255)
   createdBy          Int       @map("created_by")
+  planId             Int?      @map("plan_id")
   stripeId           String?   @map("stripe_id") @db.VarChar(255)
   pmType             String?   @map("pm_type") @db.VarChar(255)
   pmLastFour         String?   @map("pm_last_four") @db.VarChar(4)
@@ -109,10 +110,12 @@ model Company {
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
-  creator     User                @relation("CompanyCreatedBy", fields: [createdBy], references: [id])
-  members     CompanyMember[]
-  invitations CompanyInvitation[]
-  projects    Project[]
+  creator       User                @relation("CompanyCreatedBy", fields: [createdBy], references: [id])
+  plan          Plan?               @relation(fields: [planId], references: [id])
+  members       CompanyMember[]
+  invitations   CompanyInvitation[]
+  projects      Project[]
+  subscriptions Subscription[]
 
   @@map("companies")
 }
@@ -263,20 +266,23 @@ enum TaskStatus {
 
 model Plan {
   id            Int      @id @default(autoincrement())
-  name          String   @db.VarChar(255)
+  name          String   @unique @db.VarChar(255)
   price         Int
   stripePriceId String?  @map("stripe_price_id") @db.VarChar(255)
   maxProjects   Int?     @map("max_projects")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
+  companies     Company[]
+  subscriptions Subscription[]
+
   @@map("plans")
 }
 
 model Subscription {
   id           Int       @id @default(autoincrement())
-  billType     String    @map("bill_type") @db.VarChar(255)
-  billId       Int       @map("bill_id")
+  companyId    Int       @map("company_id")
+  planId       Int?      @map("plan_id")
   type         String    @db.VarChar(255)
   stripeId     String?   @map("stripe_id") @db.VarChar(255)
   stripeStatus String?   @map("stripe_status") @db.VarChar(255)
@@ -287,7 +293,9 @@ model Subscription {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  items SubscriptionItem[]
+  company Company            @relation(fields: [companyId], references: [id])
+  plan    Plan?              @relation(fields: [planId], references: [id])
+  items   SubscriptionItem[]
 
   @@map("subscriptions")
 }
