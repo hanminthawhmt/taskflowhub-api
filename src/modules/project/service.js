@@ -74,4 +74,37 @@ const findProjectById = async (id) => {
   return await projectRepo.getProjectById(id);
 };
 
-module.exports = { createProject, addProjectMembers, inviteMember, findProjectById };
+const acceptInvitation = async ({ token, userId, userEmail }) => {
+  const invitation = await projectRepo.findInvitationByToken(token);
+
+  if (!invitation) {
+    throw new AppError("Invitation not found", 404);
+  }
+  if (invitation.status !== "pending") {
+    throw new AppError(
+      "This invitation has already been used or cancelled",
+      400,
+    );
+  }
+  if (invitation.expiresAt && invitation.expiresAt < new Date()) {
+    throw new AppError("This invitation has expired", 400);
+  }
+  if (invitation.email !== userEmail) {
+    throw new AppError("This invitation was not issued to your account", 403);
+  }
+
+  return projectRepo.runTransaction(async (tx) => {
+    return projectRepo.acceptInvitationInTransaction(tx, {
+      invitation,
+      userId,
+    });
+  });
+};
+
+module.exports = {
+  createProject,
+  addProjectMembers,
+  inviteMember,
+  findProjectById,
+  acceptInvitation,
+};

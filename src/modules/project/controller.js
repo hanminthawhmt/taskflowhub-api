@@ -55,8 +55,22 @@ const handleInviteProjectMember = async (req, res, next) => {
   }
 };
 
+const handleAcceptInvitation = async (req, res, next) => {
+  try {
+    const membership = await projectService.acceptInvitation({
+      token: req.params.token,
+      userId: req.user.userId,
+      userEmail: req.user.email,
+    });
+    res.status(200).json({ message: "Invitation accepted", data: membership });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleCreateProject,
   handleAddProjectMembers,
   handleInviteProjectMember,
+  handleAcceptInvitation,
 };

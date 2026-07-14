@@ -3,7 +3,7 @@ const authenticate = require("../../middleware/authenticate");
 const checkCompanyMember = require("../../middleware/checkCompanyMember");
 const checkProjectMember = require("../../middleware/checkProjecMember");
 const checkAssigneeIsCompanyMember = require("../../middleware/checkAssigneeIsCompanyMember");
-const checkInviteeIsCompanyMember = require("../../middleware/checkInviteeIsCompanyMember")
+const checkInviteeIsCompanyMember = require("../../middleware/checkInviteeIsCompanyMember");
 const validate = require("../../middleware/validate");
 const requirePermission = require("../../middleware/requirePermisssion");
 const projectValidation = require("./validation");
@@ -37,6 +37,12 @@ router.post(
   validate(projectValidation.inviteProjectMemberSchema),
   checkInviteeIsCompanyMember,
   projectController.handleInviteProjectMember,
+);
+
+router.post(
+  "/invitations/:token/accept",
+  authenticate,
+  projectController.handleAcceptInvitation,
 );
 
 module.exports = router;

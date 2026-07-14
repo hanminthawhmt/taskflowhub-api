@@ -83,7 +83,22 @@ const markInvitationAccepted = (id) => {
 
 const getProjectById = async (id) => {
   return await prisma.project.findUnique({
-    where : {id}
+    where: { id },
+  });
+};
+
+const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
+  await tx.projectMember.create({
+    data: {
+      projectId: invitation.projectId,
+      userId,
+      roleId: invitation.roleId,
+    },
+  });
+
+  return tx.projectInvitation.update({
+    where: { id: invitation.id },
+    data: { status: "accepted", acceptedAt: new Date() },
   });
 };
 
@@ -96,4 +111,5 @@ module.exports = {
   findInvitationByToken,
   markInvitationAccepted,
   getProjectById,
+  acceptInvitationInTransaction,
 };
