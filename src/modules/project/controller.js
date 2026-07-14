@@ -1,4 +1,5 @@
 const projectService = require("./service");
+const authService = require("../auth/service");
 
 const handleCreateProject = async (req, res, next) => {
   try {
@@ -32,4 +33,30 @@ const handleAddProjectMembers = async (req, res, next) => {
   }
 };
 
-module.exports = { handleCreateProject, handleAddProjectMembers };
+const handleInviteProjectMember = async (req, res, next) => {
+  try {
+    const inviter = await authService.findById(req.user.userId);
+    const project = await projectService.findProjectById(
+      Number(req.params.projectId),
+    ); // reuse req.invitedUser? no need — email/roleId is enough
+
+    const invitation = await projectService.inviteMember({
+      projectId: Number(req.params.projectId),
+      email: req.body.email,
+      roleId: req.body.role_id,
+      invitedBy: req.user.userId,
+      projectTitle: project.title,
+      inviterName: inviter.name,
+    });
+
+    res.status(201).json({ message: "Invitation sent", data: invitation });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  handleCreateProject,
+  handleAddProjectMembers,
+  handleInviteProjectMember,
+};

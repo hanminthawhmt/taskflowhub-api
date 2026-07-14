@@ -51,9 +51,49 @@ const addMembersInTransaction = async (tx, { projectId, members }) => {
   });
 };
 
+const createInvitationInTransaction = (
+  tx,
+  { projectId, email, roleId, invitedBy },
+) => {
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  return tx.projectInvitation.create({
+    data: {
+      projectId,
+      email,
+      roleId,
+      token,
+      status: "pending",
+      invitedBy,
+      expiresAt,
+    },
+  });
+};
+
+const findInvitationByToken = (token) => {
+  return prisma.projectInvitation.findFirst({ where: { token } });
+};
+
+const markInvitationAccepted = (id) => {
+  return prisma.projectInvitation.update({
+    where: { id },
+    data: { status: "accepted", acceptedAt: new Date() },
+  });
+};
+
+const getProjectById = async (id) => {
+  return await prisma.project.findUnique({
+    where: id,
+  });
+};
+
 module.exports = {
   createProjectInTransaction,
   addProjectMemberInTransaction,
   runTransaction,
   addMembersInTransaction,
+  createInvitationInTransaction,
+  findInvitationByToken,
+  markInvitationAccepted,
+  getProjectById,
 };

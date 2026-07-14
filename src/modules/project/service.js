@@ -1,5 +1,7 @@
 const projectRepo = require("./repository");
 const roleService = require("../role/service");
+const projectInviteTemplate = require("../../services/emailTemplates/projectInvite");
+const sendMail = require("../../services/mailer");
 const AppError = require("../../util/appError");
 
 const createProject = async ({ company_id, title, description, userId }) => {
@@ -40,4 +42,36 @@ const addProjectMembers = async ({ projectId, members }) => {
   return addedMembers;
 };
 
-module.exports = { createProject, addProjectMembers };
+const inviteMember = async ({
+  projectId,
+  email,
+  roleId,
+  invitedBy,
+  projectTitle,
+  inviterName,
+}) => {
+  const invitation = await projectRepo.runTransaction(async (tx) => {
+    return projectRepo.createInvitationInTransaction(tx, {
+      projectId,
+      email,
+      roleId,
+      invitedBy,
+    });
+  });
+
+  const acceptUrl = `http://localhost:3000/api/v1/projects/invitations/${invitation.token}/accept`;
+
+  await sendMail({
+    to: email,
+    subject: `You're invited to join ${projectTitle}`,
+    html: projectInviteTemplate({ projectTitle, inviterName, acceptUrl }),
+  });
+
+  return invitation;
+};
+
+const findProjectById = async (id) => {
+  return await projectRepo.getProjectById(id);
+};
+
+module.exports = { createProject, addProjectMembers, inviteMember, findProjectById };

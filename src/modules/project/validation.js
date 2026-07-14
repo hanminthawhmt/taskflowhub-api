@@ -24,4 +24,13 @@ const addProjectMemberSchema = z.preprocess(
   }),
 );
 
-module.exports = { createProjectSchema, addProjectMemberSchema };
+const inviteProjectMemberSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  role_id: z.coerce.number().int().positive(),
+});
+
+module.exports = {
+  createProjectSchema,
+  addProjectMemberSchema,
+  inviteProjectMemberSchema,
+};
