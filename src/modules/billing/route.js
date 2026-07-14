@@ -16,4 +16,15 @@ router.post(
   billingController.handleCreateCheckoutSession,
 );
 
+router.post(
+  "/webhook",
+  express.raw({
+    type: "application/json",
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+  billingController.handleStripeWebhook,
+);
+
 module.exports = router;

@@ -36,4 +36,47 @@ const createCheckoutSession = async ({ companyId, planId, userEmail }) => {
   return { checkoutUrl: session.url };
 };
 
-module.exports = { createCheckoutSession };
+const handleCheckoutCompleted = async (session) => {
+  const companyId = Number(session?.metadata?.companyId);
+  const planId = Number(session?.metadata?.planId);
+
+  if (!session?.subscription) {
+    throw new AppError("Missing Stripe subscription in checkout session", 400);
+  }
+
+  const subscription = await stripe.subscriptions.retrieve(session.subscription);
+  const firstItem = subscription?.items?.data?.[0];
+  const priceId = firstItem?.price?.id || null;
+
+  await billingRepo.activateSubscription({
+    companyId,
+    planId,
+    stripeCustomerId: session.customer,
+    stripeSubscriptionId: session.subscription,
+    stripeStatus: subscription?.status || "unknown",
+    stripePrice: priceId,
+  });
+};
+
+const handleSubscriptionUpdated = async (subscription) => {
+  await billingRepo.updateSubscriptionStatus(
+    subscription.id,
+    subscription.status,
+  );
+};
+
+const handleWebhookEvent = async (event) => {
+  switch (event.type) {
+    case "checkout.session.completed":
+      await handleCheckoutCompleted(event.data.object);
+      break;
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted":
+      await handleSubscriptionUpdated(event.data.object);
+      break;
+    default:
+      console.log(`Unhandled Stripe event type: ${event.type}`);
+  }
+};
+
+module.exports = { createCheckoutSession, handleWebhookEvent };

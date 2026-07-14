@@ -1,4 +1,31 @@
 const billingService = require("./service");
+const { STRIPE_WEBHOOK_SECRET } = require("../../config/env");
+const stripe = require("../../config/stripe");
+
+const handleStripeWebhook = async (req, res) => {
+  const signature = req.headers["stripe-signature"];
+  const payload = req.rawBody || req.body;
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      STRIPE_WEBHOOK_SECRET,
+    );
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  try {
+    await billingService.handleWebhookEvent(event);
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("Error processing webhook event:", error);
+    res.status(500).json({ error: "Webhook handler failed" });
+  }
+};
 
 const handleCreateCheckoutSession = async (req, res, next) => {
   try {
@@ -13,4 +40,4 @@ const handleCreateCheckoutSession = async (req, res, next) => {
   }
 };
 
-module.exports = { handleCreateCheckoutSession };
+module.exports = { handleCreateCheckoutSession, handleStripeWebhook };

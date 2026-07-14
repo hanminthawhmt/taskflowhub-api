@@ -11,4 +11,5 @@ module.exports = {
   MAILTRAP_PASS: process.env.MAILTRAP_PASS,
   MAIL_FROM: process.env.MAIL_FROM,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
 };
