@@ -39,4 +39,4 @@ const checkInviteeIsCompanyMember = async (req, res, next) => {
   }
 };
 
-module.exports = { checkInviteeIsCompanyMember };
+module.exports = checkInviteeIsCompanyMember;

@@ -35,7 +35,7 @@ const handleAddProjectMembers = async (req, res, next) => {
 
 const handleInviteProjectMember = async (req, res, next) => {
   try {
-    const inviter = await authService.findById(req.user.userId);
+    const inviter = await authService.getUserById(req.user.userId);
     const project = await projectService.findProjectById(
       Number(req.params.projectId),
     ); // reuse req.invitedUser? no need — email/roleId is enough

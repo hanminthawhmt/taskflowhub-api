@@ -1,5 +1,5 @@
 const prisma = require("../../config/db");
-
+const crypto = require("crypto");
 const createProjectInTransaction = async (
   tx,
   { company_id, title, description, created_by },
@@ -83,7 +83,7 @@ const markInvitationAccepted = (id) => {
 
 const getProjectById = async (id) => {
   return await prisma.project.findUnique({
-    where: id,
+    where : {id}
   });
 };
 

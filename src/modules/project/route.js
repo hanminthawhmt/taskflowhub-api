@@ -30,7 +30,7 @@ router.post(
 );
 
 router.post(
-  "/:projectId/invitations",
+  "/projects/:projectId/invitations",
   authenticate,
   checkProjectMember,
   requirePermission("invite_project_member"),
