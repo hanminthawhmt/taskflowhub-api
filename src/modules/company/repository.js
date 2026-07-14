@@ -65,14 +65,15 @@ const getAllCompanies = async () => {
 };
 
 const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
-  await tx.companyInvitation.create({
+  await tx.companyMember.create({
     data: {
       companyId: invitation.companyId,
       userId,
       roleId: invitation.roleId,
     },
   });
-  return await tx.companyInvitation.update({
+
+  return tx.companyInvitation.update({
     where: { id: invitation.id },
     data: { status: "accepted", acceptedAt: new Date() },
   });
@@ -80,6 +81,19 @@ const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
 
 const createUserForInvitation = (tx, { name, email, password }) => {
   return tx.user.create({ data: { name, email, password } });
+};
+
+const checkInvitationStatus = async (token) => {
+  const invitation = await prisma.companyInvitation.findFirst({
+    where: { token },
+  });
+  if (!invitation) return null;
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: invitation.email },
+  });
+
+  return { invitation, userExists: !!existingUser };
 };
 
 module.exports = {
@@ -92,4 +106,5 @@ module.exports = {
   getAllCompanies,
   acceptInvitationInTransaction,
   createUserForInvitation,
+  checkInvitationStatus,
 };

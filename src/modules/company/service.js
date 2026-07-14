@@ -1,9 +1,9 @@
 const companyRepo = require("./repository");
 const sendMail = require("../../services/mailer");
 const companyInviteTemplate = require("../../services/emailTemplates/companyInvite");
-const bcrypt = require('bcrypt');
-const generateToken = require('../../util/generateToken');
-const authRepo = require('../auth/repository');
+const bcrypt = require("bcrypt");
+const generateToken = require("../../util/generateToken");
+const authRepo = require("../auth/repository");
 
 const createCompany = async (tx, { companyName, userId, ownerRoleId }) => {
   return companyRepo.createCompanyAsOwner(tx, {
@@ -116,9 +116,38 @@ const registerViaInvitation = async ({ token, name, password }) => {
   return { user: safeUser, token: token_ };
 };
 
+const getInvitationDetails = async (token) => {
+  const result = await companyRepo.checkInvitationStatus(token);
+
+  if (!result) {
+    throw new AppError("Invitation not found", 404);
+  }
+
+  const { invitation, userExists } = result;
+
+  if (invitation.status !== "pending") {
+    throw new AppError(
+      "This invitation has already been used or cancelled",
+      400,
+    );
+  }
+  if (invitation.expiresAt && invitation.expiresAt < new Date()) {
+    throw new AppError("This invitation has expired", 400);
+  }
+
+  return {
+    email: invitation.email,
+    companyId: invitation.companyId,
+    userExists, // this is the key field the frontend branches on
+  };
+};
+
 module.exports = {
   createCompany,
   inviteMember,
   findCompanyById,
   getAllCompanies,
+  getInvitationDetails,
+  registerViaInvitation,
+  acceptInvitation,
 };

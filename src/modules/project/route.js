@@ -40,7 +40,7 @@ router.post(
 );
 
 router.post(
-  "/invitations/:token/accept",
+  "/projects/invitations/:token/accept",
   authenticate,
   projectController.handleAcceptInvitation,
 );

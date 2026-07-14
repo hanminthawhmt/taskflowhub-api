@@ -62,9 +62,19 @@ const handleRegisterViaInvitation = async (req, res, next) => {
   }
 };
 
+const handleGetInvitationDetails = async (req, res, next) => {
+  try {
+    const details = await companyService.getInvitationDetails(req.params.token);
+    res.status(200).json({ data: details });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleInviteMember,
   handleGetAllCompanies,
   handleAcceptInvitation,
   handleRegisterViaInvitation,
+  handleGetInvitationDetails
 };

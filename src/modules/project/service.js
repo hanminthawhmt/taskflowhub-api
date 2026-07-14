@@ -59,7 +59,7 @@ const inviteMember = async ({
     });
   });
 
-  const acceptUrl = `http://localhost:3000/api/v1/projects/invitations/${invitation.token}/accept`;
+  const acceptUrl = `http://localhost:3000/api/v1/companies/projects/invitations/${invitation.token}/accept`;
 
   await sendMail({
     to: email,

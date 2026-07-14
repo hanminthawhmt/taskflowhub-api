@@ -38,4 +38,6 @@ router.post(
   companyController.handleRegisterViaInvitation,
 );
 
+router.get("/invitations/:token", companyController.handleGetInvitationDetails);
+
 module.exports = router;
