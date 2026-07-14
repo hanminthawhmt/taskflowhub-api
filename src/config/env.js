@@ -10,4 +10,5 @@ module.exports = {
   MAILTRAP_USER: process.env.MAILTRAP_USER,
   MAILTRAP_PASS: process.env.MAILTRAP_PASS,
   MAIL_FROM: process.env.MAIL_FROM,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
 };
