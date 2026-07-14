@@ -24,4 +24,18 @@ router.get(
   companyController.handleGetAllCompanies,
 );
 
+// Path A — existing user
+router.post(
+  "/invitations/:token/accept",
+  authenticate,
+  companyController.handleAcceptInvitation,
+);
+
+// Path B — brand new user
+router.post(
+  "/invitations/:token/register",
+  validate(companyValidation.registerViaInvitationSchema),
+  companyController.handleRegisterViaInvitation,
+);
+
 module.exports = router;

@@ -64,6 +64,24 @@ const getAllCompanies = async () => {
   return await prisma.company.findMany();
 };
 
+const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
+  await tx.companyInvitation.create({
+    data: {
+      companyId: invitation.companyId,
+      userId,
+      roleId: invitation.roleId,
+    },
+  });
+  return await tx.companyInvitation.update({
+    where: { id: invitation.id },
+    data: { status: "accepted", acceptedAt: new Date() },
+  });
+};
+
+const createUserForInvitation = (tx, { name, email, password }) => {
+  return tx.user.create({ data: { name, email, password } });
+};
+
 module.exports = {
   createCompanyAsOwner,
   createInvitation,
@@ -72,4 +90,6 @@ module.exports = {
   runTransaction,
   findCompanyById,
   getAllCompanies,
+  acceptInvitationInTransaction,
+  createUserForInvitation,
 };
