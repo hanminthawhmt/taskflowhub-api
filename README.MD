@@ -1,8 +1,6 @@
 # Task Management API (Node.js)
 
-A multi-tenant SaaS task management backend, rebuilt from an existing Laravel API into Node.js/Express as a portfolio project to demonstrate backend architecture, authentication, RBAC, billing integration, and containerization skills.
-
-> **Note:** This is a backend-only API. It was originally developed in Laravel; this version is a full rewrite in Node.js to build depth as a Node.js backend developer.
+A multi-tenant SaaS task management backend as a portfolio project to demonstrate backend architecture, authentication, RBAC, billing integration, and containerization skills.
 
 ---
 
@@ -275,6 +273,4 @@ Additional endpoints will be built incrementally alongside the frontend as real 
 
 ## Author
 
-**Han Min** — Software Engineering graduate, backend-focused developer based in Thailand (Bangkok / Chiang Mai).
-
-Originally built as a Laravel API; rebuilt in Node.js/Express to demonstrate backend architecture depth across authentication, multi-tenant RBAC, billing integration, and containerization.
+**Han Min** — Software Engineering graduate, backend-focused developer based in Thailand (Bangkok).
