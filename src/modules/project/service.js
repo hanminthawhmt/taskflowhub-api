@@ -3,6 +3,7 @@ const roleService = require("../role/service");
 const projectInviteTemplate = require("../../services/emailTemplates/projectInvite");
 const sendMail = require("../../services/mailer");
 const AppError = require("../../util/appError");
+const activityLogService = require("../activity_log/service");
 
 const createProject = async ({ company_id, title, description, userId }) => {
   try {
@@ -25,6 +26,19 @@ const createProject = async ({ company_id, title, description, userId }) => {
       return project;
     });
 
+    await activityLogService.log({
+      companyId: company_id,
+      projectId: project.id,
+      userId,
+      action: "project_created",
+      subjectType: "project",
+      subjectId: project.id,
+      meta: {
+        title,
+        description,
+      },
+    });
+
     return project;
   } catch (error) {
     throw new AppError(
@@ -34,9 +48,22 @@ const createProject = async ({ company_id, title, description, userId }) => {
   }
 };
 
-const addProjectMembers = async ({ projectId, members }) => {
+const addProjectMembers = async ({ projectId, members, userId }) => {
   const addedMembers = await projectRepo.runTransaction(async (tx) => {
     return projectRepo.addMembersInTransaction(tx, { projectId, members });
+  });
+
+  await activityLogService.log({
+    companyId: null,
+    projectId,
+    userId,
+    action: "project_member_added",
+    subjectType: "project_member",
+    subjectId: projectId,
+    meta: {
+      addedMemberIds: members.map((member) => member.user_id),
+      addedMemberCount: members.length,
+    },
   });
 
   return addedMembers;
@@ -67,6 +94,20 @@ const inviteMember = async ({
     html: projectInviteTemplate({ projectTitle, inviterName, acceptUrl }),
   });
 
+  await activityLogService.log({
+    companyId: null,
+    projectId,
+    userId: invitedBy,
+    action: "project_member_invited",
+    subjectType: "project_member",
+    subjectId: invitation.id,
+    meta: {
+      email,
+      roleId,
+      projectId,
+    },
+  });
+
   return invitation;
 };
 
@@ -93,12 +134,28 @@ const acceptInvitation = async ({ token, userId, userEmail }) => {
     throw new AppError("This invitation was not issued to your account", 403);
   }
 
-  return projectRepo.runTransaction(async (tx) => {
+  const membership = await projectRepo.runTransaction(async (tx) => {
     return projectRepo.acceptInvitationInTransaction(tx, {
       invitation,
       userId,
     });
   });
+
+  await activityLogService.log({
+    companyId: null,
+    projectId: invitation.projectId,
+    userId,
+    action: "project_member_joined",
+    subjectType: "project_member",
+    subjectId: invitation.id,
+    meta: {
+      projectId: invitation.projectId,
+      roleId: invitation.roleId,
+      email: invitation.email,
+    },
+  });
+
+  return membership;
 };
 
 module.exports = {

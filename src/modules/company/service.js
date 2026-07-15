@@ -4,6 +4,7 @@ const companyInviteTemplate = require("../../services/emailTemplates/companyInvi
 const bcrypt = require("bcrypt");
 const generateToken = require("../../util/generateToken");
 const authRepo = require("../auth/repository");
+const activityLogService = require("../activity_log/service");
 
 const createCompany = async (tx, { companyName, userId, ownerRoleId }) => {
   return companyRepo.createCompanyAsOwner(tx, {
@@ -36,6 +37,20 @@ const inviteMember = async ({
     to: email,
     subject: `You're invited to join ${companyName}`,
     html: companyInviteTemplate({ companyName, inviterName, acceptUrl }),
+  });
+
+  await activityLogService.log({
+    companyId,
+    projectId: null,
+    userId: invitedBy,
+    action: "company_member_invited",
+    subjectType: "company_member",
+    subjectId: invitation.id,
+    meta: {
+      email,
+      roleId,
+      companyId,
+    },
   });
 
   return invitation;
@@ -76,12 +91,28 @@ const validateInvitation = async (token, expectedEmail = null) => {
 const acceptInvitation = async ({ token, userId, userEmail }) => {
   const invitation = await validateInvitation(token, userEmail);
 
-  return companyRepo.runTransaction(async (tx) => {
+  const membership = await companyRepo.runTransaction(async (tx) => {
     return companyRepo.acceptInvitationInTransaction(tx, {
       invitation,
       userId,
     });
   });
+
+  await activityLogService.log({
+    companyId: invitation.companyId,
+    projectId: null,
+    userId,
+    action: "company_member_joined",
+    subjectType: "company_member",
+    subjectId: invitation.id,
+    meta: {
+      companyId: invitation.companyId,
+      roleId: invitation.roleId,
+      email: invitation.email,
+    },
+  });
+
+  return membership;
 };
 
 // Path B — brand new user, no account yet
@@ -109,6 +140,20 @@ const registerViaInvitation = async ({ token, name, password }) => {
       userId: user.id,
     });
     return { user };
+  });
+
+  await activityLogService.log({
+    companyId: invitation.companyId,
+    projectId: null,
+    userId: user.id,
+    action: "company_member_joined",
+    subjectType: "company_member",
+    subjectId: invitation.id,
+    meta: {
+      companyId: invitation.companyId,
+      roleId: invitation.roleId,
+      email: invitation.email,
+    },
   });
 
   const token_ = generateToken(user);

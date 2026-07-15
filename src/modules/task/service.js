@@ -1,5 +1,6 @@
 const taskRepo = require("./repository");
 const AppError = require("../../util/appError");
+const activityLogService = require("../activity_log/service");
 
 const createTask = async ({
   title,
@@ -29,6 +30,20 @@ const createTask = async ({
       user_id,
     });
 
+    await activityLogService.log({
+      companyId: null,
+      projectId: task.projectId,
+      userId: created_by,
+      action: "task_created",
+      subjectType: "task",
+      subjectId: task.id,
+      meta: {
+        title: task.title,
+        priority: task.priority,
+        status: task.status,
+      },
+    });
+
     return task;
   } catch (error) {
     if (error instanceof AppError) {
@@ -55,6 +70,20 @@ const updateStatus = async ({ taskId, userId, status }) => {
     throw new AppError("You can only update tasks assigned to you", 403);
   }
   const updated = await taskRepo.updateStatus(taskId, status);
+
+  await activityLogService.log({
+    companyId: null,
+    projectId: task.projectId,
+    userId,
+    action: "task_status_updated",
+    subjectType: "task",
+    subjectId: task.id,
+    meta: {
+      previousStatus: task.status,
+      newStatus: status,
+    },
+  });
+
   return updated;
 };
 

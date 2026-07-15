@@ -5,6 +5,7 @@ const AppError = require("../../util/appError");
 const generateToken = require("../../util/generateToken");
 const roleService = require("../role/service");
 const companyService = require("../company/service");
+const activityLogService = require("../activity_log/service");
 
 const registerUser = async ({ name, email, password, companyName }) => {
   const existingUser = await authRepo.findByEmail(email);
@@ -28,6 +29,18 @@ const registerUser = async ({ name, email, password, companyName }) => {
     });
 
     return { user, company };
+  });
+
+  await activityLogService.log({
+    companyId: company.id,
+    projectId: null,
+    userId: user.id,
+    action: "company_created",
+    subjectType: "company",
+    subjectId: company.id,
+    meta: {
+      companyName,
+    },
   });
 
   const token = generateToken(user);

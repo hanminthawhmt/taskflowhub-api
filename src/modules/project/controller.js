@@ -23,6 +23,7 @@ const handleAddProjectMembers = async (req, res, next) => {
     const members = await projectService.addProjectMembers({
       projectId: Number(req.params.projectId),
       members: req.body.members,
+      userId: req.user.userId,
     });
     res.status(201).json({
       message: "Members added successfully",

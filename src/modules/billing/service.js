@@ -1,6 +1,7 @@
 const billingRepo = require("./repository");
 const stripe = require("../../config/stripe");
 const AppError = require("../../util/appError");
+const activityLogService = require("../activity_log/service");
 
 const createCheckoutSession = async ({ companyId, planId, userEmail }) => {
   const plan = await billingRepo.findPlanById(planId);
@@ -48,7 +49,7 @@ const handleCheckoutCompleted = async (session) => {
   const firstItem = subscription?.items?.data?.[0];
   const priceId = firstItem?.price?.id || null;
 
-  await billingRepo.activateSubscription({
+  const activatedSubscription = await billingRepo.activateSubscription({
     companyId,
     planId,
     stripeCustomerId: session.customer,
@@ -56,13 +57,42 @@ const handleCheckoutCompleted = async (session) => {
     stripeStatus: subscription?.status || "unknown",
     stripePrice: priceId,
   });
+
+  const company = await billingRepo.findCompanyById(companyId);
+
+  await activityLogService.log({
+    companyId,
+    projectId: null,
+    userId: company?.createdBy ?? 0,
+    action: "subscription_activated",
+    subjectType: "subscription",
+    subjectId: companyId,
+    meta: {
+      planId,
+      stripeSubscriptionId: session.subscription,
+      stripeStatus: activatedSubscription?.stripeStatus || subscription?.status,
+    },
+  });
 };
 
 const handleSubscriptionUpdated = async (subscription) => {
-  await billingRepo.updateSubscriptionStatus(
+  const company = await billingRepo.updateSubscriptionStatus(
     subscription.id,
     subscription.status,
   );
+
+  await activityLogService.log({
+    companyId: company?.id,
+    projectId: null,
+    userId: company?.createdBy ?? 0,
+    action: "subscription_status_changed",
+    subjectType: "subscription",
+    subjectId: company?.id,
+    meta: {
+      stripeSubscriptionId: subscription.id,
+      stripeStatus: subscription.status,
+    },
+  });
 };
 
 const handleWebhookEvent = async (event) => {
