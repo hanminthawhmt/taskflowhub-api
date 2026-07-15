@@ -22,6 +22,121 @@ const swaggerSpec = {
         bearerFormat: "JWT",
       },
     },
+    schemas: {
+      LoginRequest: {
+        type: "object",
+        required: ["email", "password"],
+        properties: {
+          email: { type: "string", format: "email" },
+          password: { type: "string" },
+        },
+      },
+      RegisterRequest: {
+        type: "object",
+        required: ["name", "email", "password", "companyName"],
+        properties: {
+          name: { type: "string", minLength: 2 },
+          email: { type: "string", format: "email" },
+          password: { type: "string", minLength: 8 },
+          companyName: { type: "string", minLength: 2 },
+        },
+      },
+      InviteCompanyMemberRequest: {
+        type: "object",
+        required: ["email", "role_id"],
+        properties: {
+          email: { type: "string", format: "email" },
+          role_id: { type: "integer", minimum: 1 },
+        },
+      },
+      CreateProjectRequest: {
+        type: "object",
+        required: ["title"],
+        properties: {
+          title: { type: "string", minLength: 2 },
+          description: { type: "string", maxLength: 2000 },
+        },
+      },
+      ProjectMemberInput: {
+        type: "object",
+        required: ["user_id", "role_id"],
+        properties: {
+          user_id: { type: "integer", minimum: 1 },
+          role_id: { type: "integer", minimum: 1 },
+        },
+      },
+      AddProjectMembersRequest: {
+        type: "object",
+        required: ["members"],
+        properties: {
+          members: {
+            type: "array",
+            minItems: 1,
+            items: { $ref: "#/components/schemas/ProjectMemberInput" },
+          },
+        },
+      },
+      InviteProjectMemberRequest: {
+        type: "object",
+        required: ["email", "role_id"],
+        properties: {
+          email: { type: "string", format: "email" },
+          role_id: { type: "integer", minimum: 1 },
+        },
+      },
+      RegisterViaInvitationRequest: {
+        type: "object",
+        required: ["name", "password"],
+        properties: {
+          name: { type: "string", minLength: 2 },
+          password: { type: "string", minLength: 8 },
+        },
+      },
+      CreateTaskRequest: {
+        type: "object",
+        required: ["title"],
+        properties: {
+          title: { type: "string", minLength: 2 },
+          description: { type: "string", maxLength: 2000 },
+          priority: {
+            type: "string",
+            enum: ["high", "medium", "low"],
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "complete"],
+            default: "pending",
+          },
+          start_date: { type: "string", format: "date-time" },
+          end_date: { type: "string", format: "date-time" },
+          user_id: { type: "integer", minimum: 1 },
+        },
+      },
+      UpdateTaskStatusRequest: {
+        type: "object",
+        required: ["status"],
+        properties: {
+          status: {
+            type: "string",
+            enum: ["pending", "complete"],
+          },
+        },
+      },
+      CreatePermissionRequest: {
+        type: "object",
+        required: ["name"],
+        properties: {
+          name: { type: "string", pattern: "^[a-z_]+$" },
+        },
+      },
+      CreateCheckoutSessionRequest: {
+        type: "object",
+        required: ["plan_id"],
+        properties: {
+          plan_id: { type: "integer", minimum: 1 },
+        },
+      },
+    },
   },
   security: [{ bearerAuth: [] }],
   tags: [
@@ -38,6 +153,14 @@ const swaggerSpec = {
       post: {
         tags: ["Auth"],
         summary: "Login user",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/LoginRequest" },
+            },
+          },
+        },
         responses: { 200: { description: "Successful login" } },
       },
     },
@@ -45,6 +168,14 @@ const swaggerSpec = {
       post: {
         tags: ["Auth"],
         summary: "Register a new user",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/RegisterRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "User created" } },
       },
     },
@@ -52,6 +183,23 @@ const swaggerSpec = {
       post: {
         tags: ["Companies"],
         summary: "Invite a member to a company",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/InviteCompanyMemberRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Invite created" } },
       },
     },
@@ -59,6 +207,23 @@ const swaggerSpec = {
       post: {
         tags: ["Projects"],
         summary: "Create a project under a company",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateProjectRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Project created" } },
       },
     },
@@ -66,6 +231,30 @@ const swaggerSpec = {
       post: {
         tags: ["Projects"],
         summary: "Add a member to a project",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/AddProjectMembersRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Member added" } },
       },
     },
@@ -73,6 +262,15 @@ const swaggerSpec = {
       post: {
         tags: ["Companies"],
         summary: "Accept company invitation for existing user",
+        parameters: [
+          {
+            in: "path",
+            name: "token",
+            required: true,
+            schema: { type: "string" },
+            description: "Invitation token",
+          },
+        ],
         responses: { 200: { description: "Invitation accepted" } },
       },
     },
@@ -80,6 +278,23 @@ const swaggerSpec = {
       post: {
         tags: ["Companies"],
         summary: "Register using a company invitation token",
+        parameters: [
+          {
+            in: "path",
+            name: "token",
+            required: true,
+            schema: { type: "string" },
+            description: "Invitation token",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/RegisterViaInvitationRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "User registered" } },
       },
     },
@@ -87,6 +302,15 @@ const swaggerSpec = {
       get: {
         tags: ["Companies"],
         summary: "Get invitation details",
+        parameters: [
+          {
+            in: "path",
+            name: "token",
+            required: true,
+            schema: { type: "string" },
+            description: "Invitation token",
+          },
+        ],
         responses: { 200: { description: "Invitation details returned" } },
       },
     },
@@ -94,6 +318,23 @@ const swaggerSpec = {
       post: {
         tags: ["Projects"],
         summary: "Invite a user to a project",
+        parameters: [
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/InviteProjectMemberRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Project invitation created" } },
       },
     },
@@ -101,6 +342,15 @@ const swaggerSpec = {
       post: {
         tags: ["Projects"],
         summary: "Accept project invitation",
+        parameters: [
+          {
+            in: "path",
+            name: "token",
+            required: true,
+            schema: { type: "string" },
+            description: "Invitation token",
+          },
+        ],
         responses: { 200: { description: "Invitation accepted" } },
       },
     },
@@ -108,6 +358,23 @@ const swaggerSpec = {
       post: {
         tags: ["Tasks"],
         summary: "Create a task in a project",
+        parameters: [
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateTaskRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Task created" } },
       },
     },
@@ -115,6 +382,15 @@ const swaggerSpec = {
       get: {
         tags: ["Tasks"],
         summary: "Get tasks assigned to the authenticated user in a project",
+        parameters: [
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
         responses: { 200: { description: "Tasks returned" } },
       },
     },
@@ -122,6 +398,30 @@ const swaggerSpec = {
       patch: {
         tags: ["Tasks"],
         summary: "Update a task status",
+        parameters: [
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+          {
+            in: "path",
+            name: "taskId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Task identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdateTaskStatusRequest" },
+            },
+          },
+        },
         responses: { 200: { description: "Task updated" } },
       },
     },
@@ -129,6 +429,14 @@ const swaggerSpec = {
       post: {
         tags: ["Permissions"],
         summary: "Create a permission",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreatePermissionRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Permission created" } },
       },
       get: {
@@ -148,6 +456,23 @@ const swaggerSpec = {
       post: {
         tags: ["Billing"],
         summary: "Create a Stripe checkout session",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateCheckoutSessionRequest" },
+            },
+          },
+        },
         responses: { 201: { description: "Checkout session created" } },
       },
     },
