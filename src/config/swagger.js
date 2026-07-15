@@ -179,7 +179,7 @@ const swaggerSpec = {
         responses: { 201: { description: "User created" } },
       },
     },
-    "/companies/:companyId/invitations": {
+    "/companies/{companyId}/invitations": {
       post: {
         tags: ["Companies"],
         summary: "Invite a member to a company",
@@ -203,7 +203,7 @@ const swaggerSpec = {
         responses: { 201: { description: "Invite created" } },
       },
     },
-    "/companies/:companyId/projects": {
+    "/companies/{companyId}/projects": {
       post: {
         tags: ["Projects"],
         summary: "Create a project under a company",
@@ -227,7 +227,7 @@ const swaggerSpec = {
         responses: { 201: { description: "Project created" } },
       },
     },
-    "/companies/:companyId/projects/:projectId/members": {
+    "/companies/{companyId}/projects/{projectId}/members": {
       post: {
         tags: ["Projects"],
         summary: "Add a member to a project",
@@ -258,7 +258,7 @@ const swaggerSpec = {
         responses: { 201: { description: "Member added" } },
       },
     },
-    "/companies/invitations/:token/accept": {
+    "/companies/invitations/{token}/accept": {
       post: {
         tags: ["Companies"],
         summary: "Accept company invitation for existing user",
@@ -274,7 +274,7 @@ const swaggerSpec = {
         responses: { 200: { description: "Invitation accepted" } },
       },
     },
-    "/companies/invitations/:token/register": {
+    "/companies/invitations/{token}/register": {
       post: {
         tags: ["Companies"],
         summary: "Register using a company invitation token",
@@ -298,7 +298,7 @@ const swaggerSpec = {
         responses: { 201: { description: "User registered" } },
       },
     },
-    "/companies/invitations/:token": {
+    "/companies/invitations/{token}": {
       get: {
         tags: ["Companies"],
         summary: "Get invitation details",
@@ -314,7 +314,7 @@ const swaggerSpec = {
         responses: { 200: { description: "Invitation details returned" } },
       },
     },
-    "/projects/:projectId/invitations": {
+    "/projects/{projectId}/invitations": {
       post: {
         tags: ["Projects"],
         summary: "Invite a user to a project",
@@ -338,7 +338,7 @@ const swaggerSpec = {
         responses: { 201: { description: "Project invitation created" } },
       },
     },
-    "/projects/invitations/:token/accept": {
+    "/projects/invitations/{token}/accept": {
       post: {
         tags: ["Projects"],
         summary: "Accept project invitation",
@@ -354,7 +354,7 @@ const swaggerSpec = {
         responses: { 200: { description: "Invitation accepted" } },
       },
     },
-    "/projects/:projectId/tasks": {
+    "/projects/{projectId}/tasks": {
       post: {
         tags: ["Tasks"],
         summary: "Create a task in a project",
@@ -378,7 +378,7 @@ const swaggerSpec = {
         responses: { 201: { description: "Task created" } },
       },
     },
-    "/projects/:projectId/mine": {
+    "/projects/{projectId}/mine": {
       get: {
         tags: ["Tasks"],
         summary: "Get tasks assigned to the authenticated user in a project",
@@ -394,7 +394,7 @@ const swaggerSpec = {
         responses: { 200: { description: "Tasks returned" } },
       },
     },
-    "/projects/:projectId/tasks/:taskId/status": {
+    "/projects/{projectId}/tasks/{taskId}/status": {
       patch: {
         tags: ["Tasks"],
         summary: "Update a task status",
@@ -452,7 +452,7 @@ const swaggerSpec = {
         responses: { 200: { description: "Activity logs returned" } },
       },
     },
-    "/billing/:companyId/checkout": {
+    "/billing/{companyId}/checkout": {
       post: {
         tags: ["Billing"],
         summary: "Create a Stripe checkout session",
