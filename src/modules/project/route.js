@@ -13,7 +13,7 @@ const express = require("express");
 const router = express.Router();
 
 router.post(
-  "/:companyId/projects",
+  "/companies/:companyId/projects",
   authenticate,
   checkCompanyMember,
   requirePermission("create_project"),
@@ -24,7 +24,7 @@ router.post(
 );
 
 router.post(
-  "/:companyId/projects/:projectId/members",
+  "/companies/:companyId/projects/:projectId/members",
   authenticate,
   checkCompanyMember,
   requirePermission("invite_project_member"),
