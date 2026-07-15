@@ -4,6 +4,8 @@ const checkCompanyMember = require("../../middleware/checkCompanyMember");
 const checkProjectMember = require("../../middleware/checkProjecMember");
 const checkAssigneeIsCompanyMember = require("../../middleware/checkAssigneeIsCompanyMember");
 const checkInviteeIsCompanyMember = require("../../middleware/checkInviteeIsCompanyMember");
+const checkProjectLimit = require("../../middleware/checkProjectLimit");
+const checkSubscriptionActive = require("../../middleware/checkSubscriptionActive");
 const validate = require("../../middleware/validate");
 const requirePermission = require("../../middleware/requirePermisssion");
 const projectValidation = require("./validation");
@@ -15,6 +17,8 @@ router.post(
   authenticate,
   checkCompanyMember,
   requirePermission("create_project"),
+  checkSubscriptionActive,
+  checkProjectLimit,
   validate(projectValidation.createProjectSchema),
   projectController.handleCreateProject,
 );
