@@ -106,13 +106,24 @@ const getProjectById = async (id) => {
 };
 
 const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
-  await tx.projectMember.create({
-    data: {
-      projectId: invitation.projectId,
-      userId,
-      roleId: invitation.roleId,
-    },
+  const existing = await tx.projectMember.findFirst({
+    where: { projectId: invitation.projectId, userId },
   });
+
+  if (existing) {
+    await tx.projectMember.update({
+      where: { id: existing.id },
+      data: { roleId: invitation.roleId },
+    });
+  } else {
+    await tx.projectMember.create({
+      data: {
+        projectId: invitation.projectId,
+        userId,
+        roleId: invitation.roleId,
+      },
+    });
+  }
 
   return tx.projectInvitation.update({
     where: { id: invitation.id },
@@ -130,5 +141,5 @@ module.exports = {
   markInvitationAccepted,
   getProjectById,
   acceptInvitationInTransaction,
-  findProjectsForCompanyAndUser
+  findProjectsForCompanyAndUser,
 };

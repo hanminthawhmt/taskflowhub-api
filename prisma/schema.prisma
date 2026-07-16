@@ -133,6 +133,7 @@ model CompanyMember {
   user    User    @relation(fields: [userId], references: [id])
   role    Role    @relation(fields: [roleId], references: [id])
 
+  @@unique([companyId, userId])
   @@map("company_members")
 }
 

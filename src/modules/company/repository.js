@@ -107,13 +107,25 @@ const getAllCompanies = async () => {
 };
 
 const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
-  await tx.companyMember.create({
-    data: {
-      companyId: invitation.companyId,
-      userId,
-      roleId: invitation.roleId,
-    },
+  const existing = await tx.companyMember.findFirst({
+    where: { companyId: invitation.companyId, userId },
   });
+
+  if (existing) {
+    // already a member — just update their role instead of creating a duplicate
+    await tx.companyMember.update({
+      where: { id: existing.id },
+      data: { roleId: invitation.roleId },
+    });
+  } else {
+    await tx.companyMember.create({
+      data: {
+        companyId: invitation.companyId,
+        userId,
+        roleId: invitation.roleId,
+      },
+    });
+  }
 
   return tx.companyInvitation.update({
     where: { id: invitation.id },
@@ -151,5 +163,5 @@ module.exports = {
   checkInvitationStatus,
   findCompaniesForUser,
   findCompanyDetailsById,
-  findMembersForCompany
+  findMembersForCompany,
 };
