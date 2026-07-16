@@ -15,6 +15,13 @@ router.get(
   companyController.handleGetCompanyDetails,
 );
 
+router.get(
+  "/:companyId/members",
+  authenticate,
+  checkCompanyMember,
+  companyController.handleListMembers,
+);
+
 router.post(
   "/:companyId/invitations",
   authenticate,

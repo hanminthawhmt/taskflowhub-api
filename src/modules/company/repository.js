@@ -1,6 +1,19 @@
 const prisma = require("../../config/db");
 const crypto = require("crypto");
 
+const findMembersForCompany = (companyId) => {
+  return prisma.companyMember.findMany({
+    where: { companyId },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true, createdAt: true },
+      },
+      role: true,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+};
+
 const findCompanyDetailsById = (companyId) => {
   return prisma.company.findUnique({
     where: { id: companyId },
@@ -137,5 +150,6 @@ module.exports = {
   createUserForInvitation,
   checkInvitationStatus,
   findCompaniesForUser,
-  findCompanyDetailsById
+  findCompanyDetailsById,
+  findMembersForCompany
 };

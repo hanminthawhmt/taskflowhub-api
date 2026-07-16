@@ -93,6 +93,17 @@ const handleGetCompanyDetails = async (req, res, next) => {
   }
 };
 
+const handleListMembers = async (req, res, next) => {
+  try {
+    const members = await companyService.listCompanyMembers(
+      Number(req.params.companyId),
+    );
+    res.status(200).json({ data: members });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleInviteMember,
   handleGetAllCompanies,
@@ -101,4 +112,5 @@ module.exports = {
   handleGetInvitationDetails,
   handleListCompanies,
   handleGetCompanyDetails,
+  handleListMembers
 };

@@ -223,6 +223,19 @@ const getCompanyDetails = async (companyId) => {
   };
 };
 
+const listCompanyMembers = async (companyId) => {
+  const members = await companyRepo.findMembersForCompany(companyId);
+
+  return members.map((m) => ({
+    userId: m.user.id,
+    name: m.user.name,
+    email: m.user.email,
+    roleId: m.role.id,
+    roleTitle: m.role.title,
+    joinedAt: m.createdAt,
+  }));
+};
+
 module.exports = {
   createCompany,
   inviteMember,
@@ -233,4 +246,5 @@ module.exports = {
   acceptInvitation,
   listCompaniesForUser,
   getCompanyDetails,
+  listCompanyMembers
 };
