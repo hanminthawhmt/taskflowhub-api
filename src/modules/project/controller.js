@@ -69,9 +69,22 @@ const handleAcceptInvitation = async (req, res, next) => {
   }
 };
 
+const handleListProjects = async (req, res, next) => {
+  try {
+    const projects = await projectService.listProjectsForCompany(
+      Number(req.params.companyId),
+      req.user.userId,
+    );
+    res.status(200).json({ data: projects });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleCreateProject,
   handleAddProjectMembers,
   handleInviteProjectMember,
   handleAcceptInvitation,
+  handleListProjects,
 };

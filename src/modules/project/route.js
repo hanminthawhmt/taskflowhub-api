@@ -43,6 +43,13 @@ router.post(
   projectController.handleInviteProjectMember,
 );
 
+router.get(
+  "companies/:companyId/projects",
+  authenticate,
+  checkCompanyMember,
+  projectController.handleListProjects,
+);
+
 router.post(
   "/projects/invitations/:token/accept",
   authenticate,

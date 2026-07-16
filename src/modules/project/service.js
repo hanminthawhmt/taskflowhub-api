@@ -5,6 +5,19 @@ const sendMail = require("../../services/mailer");
 const AppError = require("../../util/appError");
 const activityLogService = require("../activity_log/service");
 
+const listProjectsForCompany = async (companyId, userId) => {
+  const projects = await projectRepo.findProjectsForCompanyAndUser(companyId, userId);
+
+  return projects.map((p) => ({
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    memberCount: p._count.members,
+    taskCount: p._count.tasks,
+    createdAt: p.createdAt,
+  }));
+};
+
 const createProject = async ({ company_id, title, description, userId }) => {
   try {
     const ownerRole = await roleService.getOwnerRole("Owner", "project");
@@ -164,4 +177,5 @@ module.exports = {
   inviteMember,
   findProjectById,
   acceptInvitation,
+  listProjectsForCompany
 };

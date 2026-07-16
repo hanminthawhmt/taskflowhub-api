@@ -1,5 +1,23 @@
 const prisma = require("../../config/db");
 const crypto = require("crypto");
+
+const findProjectsForCompanyAndUser = (companyId, userId) => {
+  return prisma.project.findMany({
+    where: {
+      companyId,
+      members: {
+        some: { userId },
+      },
+    },
+    include: {
+      _count: {
+        select: { members: true, tasks: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
 const createProjectInTransaction = async (
   tx,
   { company_id, title, description, created_by },
@@ -112,4 +130,5 @@ module.exports = {
   markInvitationAccepted,
   getProjectById,
   acceptInvitationInTransaction,
+  findProjectsForCompanyAndUser
 };
