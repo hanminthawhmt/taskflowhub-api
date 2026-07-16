@@ -11,4 +11,13 @@ const handleUpdateProfile = async (req, res, next) => {
   }
 };
 
-module.exports = { handleUpdateProfile };
+const handleUpdatePassword = async (req, res, next) => {
+  try {
+    await usersService.updatePassword(req.user.userId, req.body);
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { handleUpdateProfile, handleUpdatePassword };

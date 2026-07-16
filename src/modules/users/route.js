@@ -12,4 +12,11 @@ router.patch(
   usersController.handleUpdateProfile,
 );
 
+router.put(
+  "/me/password",
+  authenticate,
+  validate(usersValidation.updatePasswordSchema),
+  usersController.handleUpdatePassword,
+);
+
 module.exports = router;

@@ -15,4 +15,11 @@ const updateProfile = (id, data) => {
   });
 };
 
-module.exports = { findById, findByEmail, updateProfile };
+const updatePassword = (id, hashedPassword) => {
+  return prisma.user.update({
+    where: { id },
+    data: { password: hashedPassword },
+  });
+};
+
+module.exports = { findById, findByEmail, updateProfile, updatePassword };

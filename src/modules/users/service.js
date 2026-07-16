@@ -1,5 +1,6 @@
 const usersRepo = require("./repository");
 const AppError = require("../../util/appError");
+const bcrypt = require("bcrypt");
 
 const updateProfile = async (userId, { name, email }) => {
   if (email) {
@@ -18,4 +19,27 @@ const updateProfile = async (userId, { name, email }) => {
   return safeUser;
 };
 
-module.exports = { updateProfile };
+const updatePassword = async (userId, { currentPassword, newPassword }) => {
+  const user = await usersRepo.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw new AppError("Current password is incorrect", 401);
+  }
+
+  const isSamePassword = await bcrypt.compare(newPassword, user.password);
+  if (isSamePassword) {
+    throw new AppError(
+      "New password must be different from the current password",
+      400,
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await usersRepo.updatePassword(userId, hashedPassword);
+};
+
+module.exports = { updateProfile, updatePassword };
