@@ -7,7 +7,7 @@ const checkInviteeIsCompanyMember = require("../../middleware/checkInviteeIsComp
 const checkProjectLimit = require("../../middleware/checkProjectLimit");
 const checkSubscriptionActive = require("../../middleware/checkSubscriptionActive");
 const validate = require("../../middleware/validate");
-const requirePermission = require("../../middleware/requirePermisssion");
+const requirePermission = require("../../middleware/requirePermission");
 const projectValidation = require("./validation");
 const express = require("express");
 const router = express.Router();
@@ -44,7 +44,7 @@ router.post(
 );
 
 router.get(
-  "companies/:companyId/projects",
+  "/companies/:companyId/projects",
   authenticate,
   checkCompanyMember,
   projectController.handleListProjects,
