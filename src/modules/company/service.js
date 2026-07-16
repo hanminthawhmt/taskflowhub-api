@@ -6,6 +6,20 @@ const generateToken = require("../../util/generateToken");
 const authRepo = require("../auth/repository");
 const activityLogService = require("../activity_log/service");
 
+const listCompaniesForUser = async (userId) => {
+  const memberships = await companyRepo.findCompaniesForUser(userId);
+
+  return memberships.map((m) => ({
+    id: m.company.id,
+    name: m.company.name,
+    role: m.role.title,
+    roleId: m.role.id,
+    planName: m.company.plan?.name ?? null,
+    subscriptionStatus: m.company.subscriptionStatus,
+    createdAt: m.company.createdAt,
+  }));
+};
+
 const createCompany = async (tx, { companyName, userId, ownerRoleId }) => {
   return companyRepo.createCompanyAsOwner(tx, {
     companyName,
@@ -195,4 +209,5 @@ module.exports = {
   getInvitationDetails,
   registerViaInvitation,
   acceptInvitation,
+  listCompaniesForUser,
 };

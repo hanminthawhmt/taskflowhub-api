@@ -18,11 +18,13 @@ router.post(
 );
 
 router.get(
-  "/",
+  "/admin/all",
   authenticate,
   requireSuperAdmin,
   companyController.handleGetAllCompanies,
 );
+
+router.get("/", authenticate, companyController.handleListCompanies);
 
 // Path A — existing user
 router.post(

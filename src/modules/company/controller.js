@@ -71,10 +71,22 @@ const handleGetInvitationDetails = async (req, res, next) => {
   }
 };
 
+const handleListCompanies = async (req, res, next) => {
+  try {
+    const companies = await companyService.listCompaniesForUser(
+      req.user.userId,
+    );
+    res.status(200).json({ data: companies });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleInviteMember,
   handleGetAllCompanies,
   handleAcceptInvitation,
   handleRegisterViaInvitation,
-  handleGetInvitationDetails
+  handleGetInvitationDetails,
+  handleListCompanies,
 };
