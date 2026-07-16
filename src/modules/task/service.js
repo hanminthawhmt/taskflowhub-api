@@ -87,4 +87,28 @@ const updateStatus = async ({ taskId, userId, status }) => {
   return updated;
 };
 
-module.exports = { createTask, getMyTasks, getMyTasks, updateStatus };
+const listProjectTasks = async (projectId, filters) => {
+  const tasks = await taskRepo.findAllTasksInProject(projectId, filters);
+
+  return tasks.map((t) => ({
+    id: t.id,
+    title: t.title,
+    description: t.description,
+    priority: t.priority,
+    status: t.status,
+    startDate: t.startDate,
+    endDate: t.endDate,
+    assignee: t.user
+      ? { id: t.user.id, name: t.user.name, email: t.user.email }
+      : null,
+    createdAt: t.createdAt,
+  }));
+};
+
+module.exports = {
+  createTask,
+  getMyTasks,
+  getMyTasks,
+  updateStatus,
+  listProjectTasks,
+};

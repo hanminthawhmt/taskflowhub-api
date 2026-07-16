@@ -19,6 +19,14 @@ router.post(
 );
 
 router.get(
+  "/:projectId/tasks",
+  authenticate,
+  checkProjectMember,
+  requirePermission("view_task"),
+  taskController.handleListProjectTasks,
+);
+
+router.get(
   "/:projectId/mine",
   authenticate,
   checkProjectMember,

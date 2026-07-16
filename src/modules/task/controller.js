@@ -48,4 +48,27 @@ const handleUpdateTaskStatus = async (req, res, next) => {
   }
 };
 
-module.exports = { handleTaskCreate, handleGetMyTasks, handleUpdateTaskStatus };
+const handleListProjectTasks = async (req, res, next) => {
+  try {
+    const filters = {
+      status: req.query.status,
+      priority: req.query.priority,
+      userId: req.query.assignee ? Number(req.query.assignee) : undefined,
+    };
+
+    const tasks = await taskService.listProjectTasks(
+      Number(req.params.projectId),
+      filters,
+    );
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  handleTaskCreate,
+  handleGetMyTasks,
+  handleUpdateTaskStatus,
+  handleListProjectTasks,
+};

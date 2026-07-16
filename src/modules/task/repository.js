@@ -46,4 +46,22 @@ const updateStatus = (taskId, status) => {
   });
 };
 
-module.exports = { createTask, findById, findMyTasksInProject, updateStatus };
+const findAllTasksInProject = (projectId, filters = {}) => {
+  const where = { projectId };
+
+  if (filters.status) where.status = filters.status;
+  if (filters.priority) where.priority = filters.priority;
+  if (filters.userId) where.userId = filters.userId;
+
+  return prisma.task.findMany({
+    where,
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+module.exports = { createTask, findById, findMyTasksInProject, updateStatus, findAllTasksInProject };
