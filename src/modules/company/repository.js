@@ -150,6 +150,13 @@ const checkInvitationStatus = async (token) => {
   return { invitation, userExists: !!existingUser };
 };
 
+const updateCompanyName = (id, name) => {
+  return prisma.company.update({
+    where: { id },
+    data: { name },
+  });
+};
+
 module.exports = {
   createCompanyAsOwner,
   createInvitation,
@@ -164,4 +171,5 @@ module.exports = {
   findCompaniesForUser,
   findCompanyDetailsById,
   findMembersForCompany,
+  updateCompanyName
 };

@@ -236,6 +236,14 @@ const listCompanyMembers = async (companyId) => {
   }));
 };
 
+const updateCompanyName = async (id, name) => {
+  const company = await companyRepo.findCompanyById(id);
+  if (!company) {
+    throw new AppError("Company not found", 404);
+  }
+  return await companyRepo.updateCompanyName(company.id, name);
+};
+
 module.exports = {
   createCompany,
   inviteMember,
@@ -246,5 +254,6 @@ module.exports = {
   acceptInvitation,
   listCompaniesForUser,
   getCompanyDetails,
-  listCompanyMembers
+  listCompanyMembers,
+  updateCompanyName,
 };

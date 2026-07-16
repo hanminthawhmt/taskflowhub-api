@@ -104,6 +104,20 @@ const handleListMembers = async (req, res, next) => {
   }
 };
 
+const handleUpdateCompanyName = async (req, res, next) => {
+  try {
+    const company = await companyService.updateCompanyName(
+      Number(req.params.companyId),
+      req.body.name,
+    );
+    res
+      .status(200)
+      .json({ message: "Company name updated successfully", data: company });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleInviteMember,
   handleGetAllCompanies,
@@ -112,5 +126,6 @@ module.exports = {
   handleGetInvitationDetails,
   handleListCompanies,
   handleGetCompanyDetails,
-  handleListMembers
+  handleListMembers,
+  handleUpdateCompanyName,
 };

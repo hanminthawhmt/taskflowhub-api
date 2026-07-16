@@ -22,6 +22,15 @@ router.get(
   companyController.handleListMembers,
 );
 
+router.patch(
+  "/:companyId",
+  authenticate,
+  checkCompanyMember,
+  requirePermission("update_company_settings"),
+  validate(companyValidation.updateCompanyName),
+  companyController.handleUpdateCompanyName,
+);
+
 router.post(
   "/:companyId/invitations",
   authenticate,
