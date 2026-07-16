@@ -136,6 +136,28 @@ const swaggerSpec = {
           plan_id: { type: "integer", minimum: 1 },
         },
       },
+      UpdateProfileRequest: {
+        type: "object",
+        properties: {
+          name: { type: "string", minLength: 2 },
+          email: { type: "string", format: "email" },
+        },
+      },
+      UpdatePasswordRequest: {
+        type: "object",
+        required: ["currentPassword", "newPassword"],
+        properties: {
+          currentPassword: { type: "string" },
+          newPassword: { type: "string", minLength: 8 },
+        },
+      },
+      PromoteSuperAdminRequest: {
+        type: "object",
+        required: ["user_id"],
+        properties: {
+          user_id: { type: "integer", minimum: 1 },
+        },
+      },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -147,6 +169,8 @@ const swaggerSpec = {
     { name: "Permissions", description: "Permission resources" },
     { name: "Billing", description: "Checkout and Stripe webhook endpoints" },
     { name: "Activity Logs", description: "Activity audit log endpoints" },
+    { name: "Users", description: "Authenticated user profile and password endpoints" },
+    { name: "Admin", description: "Administrative endpoints" },
   ],
   paths: {
     "/auth/login": {
@@ -179,6 +203,45 @@ const swaggerSpec = {
         responses: { 201: { description: "User created" } },
       },
     },
+    "/companies": {
+      get: {
+        tags: ["Companies"],
+        summary: "List companies for the authenticated user",
+        responses: { 200: { description: "Companies returned" } },
+      },
+    },
+    "/companies/{companyId}": {
+      get: {
+        tags: ["Companies"],
+        summary: "Get company details",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Company details returned" } },
+      },
+    },
+    "/companies/{companyId}/members": {
+      get: {
+        tags: ["Companies"],
+        summary: "List company members",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Company members returned" } },
+      },
+    },
     "/companies/{companyId}/invitations": {
       post: {
         tags: ["Companies"],
@@ -203,7 +266,28 @@ const swaggerSpec = {
         responses: { 201: { description: "Invite created" } },
       },
     },
+    "/companies/admin/all": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get all companies as a super admin",
+        responses: { 200: { description: "Companies returned" } },
+      },
+    },
     "/companies/{companyId}/projects": {
+      get: {
+        tags: ["Projects"],
+        summary: "List projects for a company",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Projects returned" } },
+      },
       post: {
         tags: ["Projects"],
         summary: "Create a project under a company",
@@ -355,6 +439,20 @@ const swaggerSpec = {
       },
     },
     "/projects/{projectId}/tasks": {
+      get: {
+        tags: ["Tasks"],
+        summary: "List tasks in a project",
+        parameters: [
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        responses: { 200: { description: "Tasks returned" } },
+      },
       post: {
         tags: ["Tasks"],
         summary: "Create a task in a project",
@@ -425,6 +523,51 @@ const swaggerSpec = {
         responses: { 200: { description: "Task updated" } },
       },
     },
+    "/admin/promote-super-admin": {
+      post: {
+        tags: ["Admin"],
+        summary: "Promote a user to super admin",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/PromoteSuperAdminRequest" },
+            },
+          },
+        },
+        responses: { 201: { description: "Super admin promoted" } },
+      },
+    },
+    "/users/me": {
+      patch: {
+        tags: ["Users"],
+        summary: "Update the authenticated user's profile",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdateProfileRequest" },
+            },
+          },
+        },
+        responses: { 200: { description: "Profile updated" } },
+      },
+    },
+    "/users/me/password": {
+      put: {
+        tags: ["Users"],
+        summary: "Change the authenticated user's password",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdatePasswordRequest" },
+            },
+          },
+        },
+        responses: { 200: { description: "Password updated" } },
+      },
+    },
     "/permissions": {
       post: {
         tags: ["Permissions"],
@@ -450,6 +593,13 @@ const swaggerSpec = {
         tags: ["Activity Logs"],
         summary: "Get activity logs",
         responses: { 200: { description: "Activity logs returned" } },
+      },
+    },
+    "/billing/plans": {
+      get: {
+        tags: ["Billing"],
+        summary: "List available billing plans",
+        responses: { 200: { description: "Plans returned" } },
       },
     },
     "/billing/{companyId}/checkout": {
