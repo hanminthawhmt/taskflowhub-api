@@ -8,6 +8,13 @@ const companyValidation = require("./validation");
 const express = require("express");
 const router = express.Router();
 
+router.get(
+  "/:companyId",
+  authenticate,
+  checkCompanyMember,
+  companyController.handleGetCompanyDetails,
+);
+
 router.post(
   "/:companyId/invitations",
   authenticate,

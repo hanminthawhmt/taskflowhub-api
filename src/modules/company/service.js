@@ -201,6 +201,28 @@ const getInvitationDetails = async (token) => {
   };
 };
 
+const getCompanyDetails = async (companyId) => {
+  const company = await companyRepo.findCompanyDetailsById(companyId);
+
+  if (!company) {
+    throw new AppError("Company not found", 404);
+  }
+
+  return {
+    id: company.id,
+    name: company.name,
+    subscriptionStatus: company.subscriptionStatus,
+    planName: company.plan?.name ?? null,
+    planId: company.planId,
+    maxProjects: company.plan?.maxProjects ?? null,
+    createdBy: company.creator,
+    memberCount: company._count.members,
+    projectCount: company._count.projects,
+    trialEndsAt: company.trialEndsAt,
+    createdAt: company.createdAt,
+  };
+};
+
 module.exports = {
   createCompany,
   inviteMember,
@@ -210,4 +232,5 @@ module.exports = {
   registerViaInvitation,
   acceptInvitation,
   listCompaniesForUser,
+  getCompanyDetails,
 };
