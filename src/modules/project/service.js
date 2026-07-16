@@ -6,7 +6,10 @@ const AppError = require("../../util/appError");
 const activityLogService = require("../activity_log/service");
 
 const listProjectsForCompany = async (companyId, userId) => {
-  const projects = await projectRepo.findProjectsForCompanyAndUser(companyId, userId);
+  const projects = await projectRepo.findProjectsForCompanyAndUser(
+    companyId,
+    userId,
+  );
 
   return projects.map((p) => ({
     id: p.id,
@@ -171,11 +174,51 @@ const acceptInvitation = async ({ token, userId, userEmail }) => {
   return membership;
 };
 
+const listProjectMembers = async (projectId) => {
+  const members = await projectRepo.findMembersForProject(projectId);
+
+  return members.map((m) => ({
+    userId: m.user.id,
+    name: m.user.name,
+    email: m.user.email,
+    roleId: m.role.id,
+    roleTitle: m.role.title,
+    joinedAt: m.createdAt,
+  }));
+};
+
+const updateProjectSettings = async (projectId, { title, description }) => {
+  const project = await projectRepo.getProjectById(projectId);
+  if (!project) {
+    throw new AppError("Project not found", 404);
+  }
+
+  const data = {};
+  if (title !== undefined) data.title = title;
+  if (description !== undefined) data.description = description;
+
+  return projectRepo.updateProject(projectId, data);
+};
+
+const deleteProject = async (projectId) => {
+  const project = await projectRepo.getProjectById(projectId);
+  if (!project) {
+    throw new AppError("Project not found", 404);
+  }
+
+  return projectRepo.runTransaction(async (tx) => {
+    return projectRepo.deleteProjectInTransaction(tx, projectId);
+  });
+};
+
 module.exports = {
   createProject,
   addProjectMembers,
   inviteMember,
   findProjectById,
   acceptInvitation,
-  listProjectsForCompany
+  listProjectsForCompany,
+  listProjectMembers,
+  updateProjectSettings,
+  deleteProject,
 };

@@ -56,4 +56,32 @@ router.post(
   projectController.handleAcceptInvitation,
 );
 
+router.get(
+  "/companies/:companyId/projects/:projectId/members",
+  authenticate,
+  checkCompanyMember,
+  checkProjectMember,
+  requirePermission("view_project"),
+  projectController.handleListProjectMembers,
+);
+
+router.patch(
+  "/companies/:companyId/projects/:projectId",
+  authenticate,
+  checkCompanyMember,
+  checkProjectMember,
+  requirePermission("update_project_settings"),
+  validate(projectValidation.updateProjectSchema),
+  projectController.handleUpdateProject,
+);
+
+router.delete(
+  "/companies/:companyId/projects/:projectId",
+  authenticate,
+  checkCompanyMember,
+  checkProjectMember,
+  requirePermission("delete_project"),
+  projectController.handleDeleteProject,
+);
+
 module.exports = router;

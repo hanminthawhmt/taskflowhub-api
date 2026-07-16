@@ -105,6 +105,13 @@ const getProjectById = async (id) => {
   });
 };
 
+const updateProject = (id, data) => {
+  return prisma.project.update({
+    where: { id },
+    data,
+  });
+};
+
 const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
   const existing = await tx.projectMember.findFirst({
     where: { projectId: invitation.projectId, userId },
@@ -131,6 +138,26 @@ const acceptInvitationInTransaction = async (tx, { invitation, userId }) => {
   });
 };
 
+const findMembersForProject = (projectId) => {
+  return prisma.projectMember.findMany({
+    where: { projectId },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+      role: true,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+};
+
+const deleteProjectInTransaction = async (tx, projectId) => {
+  await tx.task.deleteMany({ where: { projectId } });
+  await tx.projectInvitation.deleteMany({ where: { projectId } });
+  await tx.projectMember.deleteMany({ where: { projectId } });
+  return tx.project.delete({ where: { id: projectId } });
+};
+
 module.exports = {
   createProjectInTransaction,
   addProjectMemberInTransaction,
@@ -142,4 +169,7 @@ module.exports = {
   getProjectById,
   acceptInvitationInTransaction,
   findProjectsForCompanyAndUser,
+  findMembersForProject,
+  updateProject,
+  deleteProjectInTransaction,
 };

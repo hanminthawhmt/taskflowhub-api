@@ -81,10 +81,47 @@ const handleListProjects = async (req, res, next) => {
   }
 };
 
+const handleListProjectMembers = async (req, res, next) => {
+  try {
+    const members = await projectService.listProjectMembers(
+      Number(req.params.projectId),
+    );
+    res.status(200).json({ data: members });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleUpdateProject = async (req, res, next) => {
+  try {
+    const project = await projectService.updateProjectSettings(
+      Number(req.params.projectId),
+      req.body,
+    );
+    res
+      .status(200)
+      .json({ message: "Project updated successfully", data: project });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleDeleteProject = async (req, res, next) => {
+  try {
+    await projectService.deleteProject(Number(req.params.projectId));
+    res.status(200).json({ message: "Project deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleCreateProject,
   handleAddProjectMembers,
   handleInviteProjectMember,
   handleAcceptInvitation,
   handleListProjects,
+  handleListProjectMembers,
+  handleUpdateProject,
+  handleDeleteProject,
 };
