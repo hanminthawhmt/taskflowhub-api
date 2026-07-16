@@ -109,4 +109,15 @@ const handleWebhookEvent = async (event) => {
   }
 };
 
-module.exports = { createCheckoutSession, handleWebhookEvent };
+const listPlans = async () => {
+  const plans = await billingRepo.findAllPlans();
+
+  return plans.map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    maxProjects: p.maxProjects,
+  }));
+};
+
+module.exports = { createCheckoutSession, handleWebhookEvent, listPlans };

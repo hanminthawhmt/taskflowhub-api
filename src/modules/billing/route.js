@@ -7,6 +7,8 @@ const validate = require("../../middleware/validate");
 const billingValidation = require("./validation");
 const billingController = require("./controller");
 
+router.get("/plans", billingController.handleListPlans);
+
 router.post(
   "/:companyId/checkout",
   authenticate,

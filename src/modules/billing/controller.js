@@ -2,6 +2,15 @@ const billingService = require("./service");
 const { STRIPE_WEBHOOK_SECRET } = require("../../config/env");
 const stripe = require("../../config/stripe");
 
+const handleListPlans = async (req, res, next) => {
+  try {
+    const plans = await billingService.listPlans();
+    res.status(200).json({ data: plans });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const handleStripeWebhook = async (req, res) => {
   const signature = req.headers["stripe-signature"];
   const payload = req.rawBody || req.body;
@@ -40,4 +49,8 @@ const handleCreateCheckoutSession = async (req, res, next) => {
   }
 };
 
-module.exports = { handleCreateCheckoutSession, handleStripeWebhook };
+module.exports = {
+  handleCreateCheckoutSession,
+  handleStripeWebhook,
+  handleListPlans,
+};

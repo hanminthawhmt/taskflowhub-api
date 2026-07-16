@@ -1,5 +1,11 @@
 const prisma = require("../../config/db");
 
+const findAllPlans = () => {
+  return prisma.plan.findMany({
+    orderBy: { price: "asc" },
+  });
+};
+
 const findPlanById = (id) => {
   return prisma.plan.findUnique({ where: { id } });
 };
@@ -80,5 +86,6 @@ module.exports = {
   findPlanByStripePrice,
   findCompanyByStripeId,
   activateSubscription,
-  updateSubscriptionStatus
+  updateSubscriptionStatus,
+  findAllPlans,
 };
