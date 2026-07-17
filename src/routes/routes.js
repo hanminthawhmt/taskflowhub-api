@@ -13,7 +13,7 @@ router.use("/companies", companyRoutes);
 router.use("/", projectRoutes);
 router.use("/projects", taskRoutes);
 router.use("/permissions", permissionRoutes);
-router.use("/activity-logs", activityLogRoutes);
+router.use("/", activityLogRoutes);
 router.use("/admin", adminRoutes);
 router.use("/users", usersRoutes);
 

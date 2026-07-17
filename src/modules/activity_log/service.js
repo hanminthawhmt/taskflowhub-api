@@ -9,8 +9,33 @@ const log = async (params) => {
   }
 };
 
-const getCompanyActivity = (companyId, limit) => {
-  return activityLogRepo.findRecentForCompany(companyId, limit);
+const getCompanyActivity = async (companyId, page, limit) => {
+  const pageNum = Number(page) || 1;
+  const limitNum = Number(limit) || 10;
+
+  const [logs, total] = await Promise.all([
+    activityLogRepo.findRecentForCompany(companyId, pageNum, limitNum),
+    activityLogRepo.countForCompany(companyId),
+  ]);
+
+  const data = logs.map((log) => ({
+    id: log.id,
+    userId: log.userId,
+    userName: log.user?.name ?? "Unknown user",
+    action: log.action,
+    target: log.subjectType && log.meta?.title ? log.meta.title : null,
+    createdAt: log.createdAt,
+  }));
+
+  return {
+    data,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
+  };
 };
 
 const getProjectActivity = (projectId, limit) => {

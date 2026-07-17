@@ -22,13 +22,20 @@ const createLog = ({
   });
 };
 
-const findRecentForCompany = (companyId, limit = 20) => {
+const findRecentForCompany = (companyId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
   return prisma.activityLog.findMany({
     where: { companyId },
     orderBy: { createdAt: "desc" },
+    skip,
     take: limit,
     include: { user: { select: { id: true, name: true, email: true } } },
   });
+};
+
+const countForCompany = (companyId) => {
+  return prisma.activityLog.count({ where: { companyId } });
 };
 
 const findRecentForProject = (projectId, limit = 20) => {
@@ -53,4 +60,5 @@ module.exports = {
   findRecentForCompany,
   findRecentForProject,
   findAllRecent,
+  countForCompany,
 };

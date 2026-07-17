@@ -11,4 +11,17 @@ const handleGetAllActivity = async (req, res, next) => {
   }
 };
 
-module.exports = { handleGetAllActivity };
+const handleGetCompanyActivity = async (req, res, next) => {
+  try {
+    const result = await activityLogService.getCompanyActivity(
+      Number(req.params.companyId),
+      req.query.page,
+      req.query.limit,
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { handleGetAllActivity, handleGetCompanyActivity };
