@@ -225,6 +225,28 @@ const swaggerSpec = {
         ],
         responses: { 200: { description: "Company details returned" } },
       },
+      patch: {
+        tags: ["Companies"],
+        summary: "Update company name",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object", required: ["name"], properties: { name: { type: "string", minLength: 2 } } },
+            },
+          },
+        },
+        responses: { 200: { description: "Company updated" } },
+      },
     },
     "/companies/{companyId}/members": {
       get: {
@@ -240,6 +262,38 @@ const swaggerSpec = {
           },
         ],
         responses: { 200: { description: "Company members returned" } },
+      },
+    },
+    "/companies/{companyId}/stats": {
+      get: {
+        tags: ["Companies"],
+        summary: "Get company stats",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Company stats returned" } },
+      },
+    },
+    "/companies/{companyId}/analytics/weekly": {
+      get: {
+        tags: ["Companies"],
+        summary: "Get weekly company analytics",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Weekly analytics returned" } },
       },
     },
     "/companies/{companyId}/invitations": {
@@ -312,6 +366,27 @@ const swaggerSpec = {
       },
     },
     "/companies/{companyId}/projects/{projectId}/members": {
+      get: {
+        tags: ["Projects"],
+        summary: "List project members",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        responses: { 200: { description: "Project members returned" } },
+      },
       post: {
         tags: ["Projects"],
         summary: "Add a member to a project",
@@ -340,6 +415,58 @@ const swaggerSpec = {
           },
         },
         responses: { 201: { description: "Member added" } },
+      },
+    },
+    "/companies/{companyId}/projects/{projectId}": {
+      patch: {
+        tags: ["Projects"],
+        summary: "Update a project",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object", properties: { title: { type: "string", minLength: 2 }, description: { type: "string", maxLength: 2000 } } },
+            },
+          },
+        },
+        responses: { 200: { description: "Project updated" } },
+      },
+      delete: {
+        tags: ["Projects"],
+        summary: "Delete a project",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+          {
+            in: "path",
+            name: "projectId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Project identifier",
+          },
+        ],
+        responses: { 200: { description: "Project deleted" } },
       },
     },
     "/companies/invitations/{token}/accept": {
@@ -523,6 +650,22 @@ const swaggerSpec = {
         responses: { 200: { description: "Task updated" } },
       },
     },
+    "/projects/companies/{companyId}/tasks/upcoming": {
+      get: {
+        tags: ["Tasks"],
+        summary: "Get upcoming tasks for a company",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Upcoming tasks returned" } },
+      },
+    },
     "/admin/promote-super-admin": {
       post: {
         tags: ["Admin"],
@@ -593,6 +736,22 @@ const swaggerSpec = {
         tags: ["Activity Logs"],
         summary: "Get activity logs",
         responses: { 200: { description: "Activity logs returned" } },
+      },
+    },
+    "/companies/{companyId}/activity-logs": {
+      get: {
+        tags: ["Activity Logs"],
+        summary: "Get activity logs for a company",
+        parameters: [
+          {
+            in: "path",
+            name: "companyId",
+            required: true,
+            schema: { type: "integer" },
+            description: "Company identifier",
+          },
+        ],
+        responses: { 200: { description: "Company activity logs returned" } },
       },
     },
     "/billing/plans": {
