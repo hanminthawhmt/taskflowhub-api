@@ -682,6 +682,11 @@ const swaggerSpec = {
       },
     },
     "/users/me": {
+      get: {
+        tags: ["Users"],
+        summary: "Get the authenticated user's profile",
+        responses: { 200: { description: "Profile returned" } },
+      },
       patch: {
         tags: ["Users"],
         summary: "Update the authenticated user's profile",

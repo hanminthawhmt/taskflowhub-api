@@ -42,4 +42,13 @@ const updatePassword = async (userId, { currentPassword, newPassword }) => {
   await usersRepo.updatePassword(userId, hashedPassword);
 };
 
-module.exports = { updateProfile, updatePassword };
+const getProfileData = async (userId) => {
+  const user = await usersRepo.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  const { password: _, ...safeUser } = user;
+  return safeUser;
+};
+
+module.exports = { updateProfile, updatePassword, getProfileData };

@@ -19,4 +19,6 @@ router.put(
   usersController.handleUpdatePassword,
 );
 
+router.get("/me", authenticate, usersController.handleGetProfile);
+
 module.exports = router;

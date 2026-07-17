@@ -20,4 +20,17 @@ const handleUpdatePassword = async (req, res, next) => {
   }
 };
 
-module.exports = { handleUpdateProfile, handleUpdatePassword };
+const handleGetProfile = async (req, res, next) => {
+  try {
+    const user = await usersService.getProfileData(req.user.userId);
+    res.status(200).json({ data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  handleUpdateProfile,
+  handleUpdatePassword,
+  handleGetProfile,
+};
