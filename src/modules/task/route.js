@@ -2,6 +2,7 @@ const taskController = require("./controller");
 const validate = require("../../middleware/validate");
 const authenticate = require("../../middleware/authenticate");
 const checkProjectMember = require("../../middleware/checkProjecMember");
+const checkCompanyMember = require("../../middleware/checkCompanyMember");
 const checkAssigneeIsProjectMember = require("../../middleware/checkAssigneeIsProjectMember");
 const requirePermission = require("../../middleware/requirePermission");
 const taskValidation = require("./validation");
@@ -40,4 +41,13 @@ router.patch(
   validate(taskValidation.updateTaskStatusSchema),
   taskController.handleUpdateTaskStatus,
 );
+
+router.get(
+  "/companies/:companyId/upcoming",
+  authenticate,
+  checkCompanyMember,
+  requirePermission("view_task"),
+  taskController.handleGetUpcomingTasks,
+);
+
 module.exports = router;

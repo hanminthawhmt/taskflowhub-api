@@ -64,4 +64,32 @@ const findAllTasksInProject = (projectId, filters = {}) => {
   });
 };
 
-module.exports = { createTask, findById, findMyTasksInProject, updateStatus, findAllTasksInProject };
+const findUpcomingTasksForUser = (companyId, userId, lookaheadDate) => {
+  return prisma.task.findMany({
+    where: {
+      project: {
+        companyId,
+        members: { some: { userId } }, // only projects the user actually belongs to
+      },
+      endDate: {
+        not: null,
+        lte: lookaheadDate,
+        gte: new Date(),
+      },
+      status: "pending", // no point surfacing already-completed tasks as "upcoming"
+    },
+    include: {
+      project: { select: { title: true } },
+    },
+    orderBy: { endDate: "asc" },
+  });
+};
+
+module.exports = {
+  createTask,
+  findById,
+  findMyTasksInProject,
+  updateStatus,
+  findAllTasksInProject,
+  findUpcomingTasksForUser
+};

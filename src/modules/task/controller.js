@@ -66,9 +66,23 @@ const handleListProjectTasks = async (req, res, next) => {
   }
 };
 
+const handleGetUpcomingTasks = async (req, res, next) => {
+  try {
+    const tasks = await taskService.getUpcomingTasksForCompany(
+      Number(req.params.companyId),
+      req.user.userId,
+      req.query.days,
+    );
+    res.status(200).json({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleTaskCreate,
   handleGetMyTasks,
   handleUpdateTaskStatus,
   handleListProjectTasks,
+  handleGetUpcomingTasks,
 };

@@ -105,10 +105,31 @@ const listProjectTasks = async (projectId, filters) => {
   }));
 };
 
+const getUpcomingTasksForCompany = async (companyId, userId, days) => {
+  const lookaheadDays = Number(days) || 7;
+  const lookaheadDate = new Date();
+  lookaheadDate.setDate(lookaheadDate.getDate() + lookaheadDays);
+
+  const tasks = await taskRepo.findUpcomingTasksForUser(
+    companyId,
+    userId,
+    lookaheadDate,
+  );
+
+  return tasks.map((t) => ({
+    id: t.id,
+    title: t.title,
+    projectTitle: t.project.title,
+    endDate: t.endDate,
+    priority: t.priority,
+  }));
+};
+
 module.exports = {
   createTask,
   getMyTasks,
   getMyTasks,
   updateStatus,
   listProjectTasks,
+  getUpcomingTasksForCompany
 };
