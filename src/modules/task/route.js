@@ -43,7 +43,7 @@ router.patch(
 );
 
 router.get(
-  "/companies/:companyId/upcoming",
+  "/companies/:companyId/tasks/upcoming",
   authenticate,
   checkCompanyMember,
   requirePermission("view_task"),
