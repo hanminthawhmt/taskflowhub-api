@@ -157,6 +157,41 @@ const updateCompanyName = (id, name) => {
   });
 };
 
+const getCompanyStats = async (companyId, dateFilter = {}) => {
+  const projectCount = await prisma.project.count({
+    where: { companyId },
+  });
+
+  const taskWhere = {
+    project: { companyId },
+    ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
+  };
+
+  const tasksCompleted = await prisma.task.count({
+    where: { ...taskWhere, status: "complete" },
+  });
+
+  const pendingTasks = await prisma.task.count({
+    where: { ...taskWhere, status: "pending" },
+  });
+
+  return { projectCount, tasksCompleted, pendingTasks };
+};
+
+const getTasksInDateRange = (companyId, from, to) => {
+  return prisma.task.findMany({
+    where: {
+      project: { companyId },
+      createdAt: { gte: from, lte: to },
+    },
+    select: {
+      createdAt: true,
+      updatedAt: true,
+      status: true,
+    },
+  });
+};
+
 module.exports = {
   createCompanyAsOwner,
   createInvitation,
@@ -171,5 +206,7 @@ module.exports = {
   findCompaniesForUser,
   findCompanyDetailsById,
   findMembersForCompany,
-  updateCompanyName
+  updateCompanyName,
+  getCompanyStats,
+  getTasksInDateRange,
 };

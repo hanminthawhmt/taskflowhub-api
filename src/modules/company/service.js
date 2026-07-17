@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const generateToken = require("../../util/generateToken");
 const authRepo = require("../auth/repository");
 const activityLogService = require("../activity_log/service");
+const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const listCompaniesForUser = async (userId) => {
   const memberships = await companyRepo.findCompaniesForUser(userId);
@@ -244,6 +245,82 @@ const updateCompanyName = async (id, name) => {
   return await companyRepo.updateCompanyName(company.id, name);
 };
 
+const getCompanyStats = async (companyId, period) => {
+  let dateFilter = {};
+
+  if (period === "week") {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    dateFilter = { gte: weekAgo };
+  } else if (period === "month") {
+    const monthAgo = new Date();
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    dateFilter = { gte: monthAgo };
+  }
+
+  const { projectCount, tasksCompleted, pendingTasks } =
+    await companyRepo.getCompanyStats(companyId, dateFilter);
+
+  const totalRelevantTasks = tasksCompleted + pendingTasks;
+  const successRate =
+    totalRelevantTasks > 0
+      ? Math.round((tasksCompleted / totalRelevantTasks) * 100)
+      : 0;
+
+  return {
+    activeProjects: projectCount,
+    tasksCompleted,
+    pendingTasks,
+    successRate,
+  };
+};
+
+const getWeeklyTaskActivity = async (companyId, fromParam, toParam) => {
+  const to = toParam ? new Date(toParam) : new Date();
+  const from = fromParam
+    ? new Date(fromParam)
+    : new Date(to.getTime() - 6 * 24 * 60 * 60 * 1000);
+
+  const tasks = await companyRepo.getTasksInDateRange(companyId, from, to);
+
+  // Build one bucket per day in the range, in order
+  const buckets = [];
+  const cursor = new Date(from);
+  cursor.setHours(0, 0, 0, 0);
+  const endCursor = new Date(to);
+  endCursor.setHours(23, 59, 59, 999);
+
+  while (cursor <= endCursor) {
+    buckets.push({
+      dateKey: cursor.toISOString().slice(0, 10), // "2026-07-16"
+      day: DAY_LABELS[cursor.getDay()],
+      completed: 0,
+      created: 0,
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  const bucketByDateKey = Object.fromEntries(
+    buckets.map((b) => [b.dateKey, b]),
+  );
+
+  for (const task of tasks) {
+    const createdKey = task.createdAt.toISOString().slice(0, 10);
+    if (bucketByDateKey[createdKey]) {
+      bucketByDateKey[createdKey].created += 1;
+    }
+
+    if (task.status === "complete") {
+      const updatedKey = task.updatedAt.toISOString().slice(0, 10);
+      if (bucketByDateKey[updatedKey]) {
+        bucketByDateKey[updatedKey].completed += 1;
+      }
+    }
+  }
+
+  return buckets.map(({ dateKey, ...rest }) => rest); // drop internal dateKey from response
+};
+
 module.exports = {
   createCompany,
   inviteMember,
@@ -256,4 +333,6 @@ module.exports = {
   getCompanyDetails,
   listCompanyMembers,
   updateCompanyName,
+  getCompanyStats,
+  getWeeklyTaskActivity,
 };

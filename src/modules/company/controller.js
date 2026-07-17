@@ -118,6 +118,31 @@ const handleUpdateCompanyName = async (req, res, next) => {
   }
 };
 
+const handleGetCompanyStats = async (req, res, next) => {
+  try {
+    const stats = await companyService.getCompanyStats(
+      Number(req.params.companyId),
+      req.query.period,
+    );
+    res.status(200).json({ data: stats });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleGetWeeklyActivity = async (req, res, next) => {
+  try {
+    const activity = await companyService.getWeeklyTaskActivity(
+      Number(req.params.companyId),
+      req.query.from,
+      req.query.to,
+    );
+    res.status(200).json({ data: activity });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleInviteMember,
   handleGetAllCompanies,
@@ -128,4 +153,6 @@ module.exports = {
   handleGetCompanyDetails,
   handleListMembers,
   handleUpdateCompanyName,
+  handleGetCompanyStats,
+  handleGetWeeklyActivity,
 };

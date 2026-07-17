@@ -47,6 +47,22 @@ router.get(
   companyController.handleGetAllCompanies,
 );
 
+router.get(
+  "/:companyId/stats",
+  authenticate,
+  checkCompanyMember,
+  requirePermission("view_company"),
+  companyController.handleGetCompanyStats,
+);
+
+router.get(
+  "/:companyId/analytics/weekly",
+  authenticate,
+  checkCompanyMember,
+  requirePermission("view_company"),
+  companyController.handleGetWeeklyActivity,
+);
+
 router.get("/", authenticate, companyController.handleListCompanies);
 
 // Path A — existing user
