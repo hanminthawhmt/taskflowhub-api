@@ -30,7 +30,7 @@ const createTask = async ({
       project_id,
       user_id,
     });
-    const project = await projectRepo.findById(project_id);
+    const project = await projectRepo.getProjectById(project_id);
 
     await activityLogService.log({
       companyId: project?.companyId ?? null,
@@ -71,7 +71,7 @@ const updateStatus = async ({ taskId, userId, status }) => {
     throw new AppError("You can only update tasks assigned to you", 403);
   }
   const updated = await taskRepo.updateStatus(taskId, status);
-
+  const project = await projectRepo.getProjectById(task.projectId);
   await activityLogService.log({
     companyId: project?.companyId ?? null,
     projectId: task.projectId,
@@ -79,7 +79,7 @@ const updateStatus = async ({ taskId, userId, status }) => {
     action: "task_status_updated",
     subjectType: "task",
     subjectId: task.id,
-     meta: {
+    meta: {
       title: task.title,
       newStatus: status,
       previousStatus: task.status, // worth adding — you have this for free before the update overwrites it

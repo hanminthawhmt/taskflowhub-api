@@ -70,7 +70,7 @@ const addProjectMembers = async ({ projectId, members, userId }) => {
     return projectRepo.addMembersInTransaction(tx, { projectId, members });
   });
 
-  const project = await projectRepo.findById(projectId);
+  const project = await projectRepo.getProjectById(projectId);
 
   await activityLogService.log({
     companyId: project?.companyId ?? null,
