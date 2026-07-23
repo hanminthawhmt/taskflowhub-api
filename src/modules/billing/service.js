@@ -2,6 +2,7 @@ const billingRepo = require("./repository");
 const stripe = require("../../config/stripe");
 const AppError = require("../../util/appError");
 const activityLogService = require("../activity_log/service");
+const { APP_URL } = require("../../config/env");
 
 const createCheckoutSession = async ({ companyId, planId, userEmail }) => {
   const plan = await billingRepo.findPlanById(planId);
@@ -27,8 +28,8 @@ const createCheckoutSession = async ({ companyId, planId, userEmail }) => {
         quantity: 1,
       },
     ],
-    success_url: `http://localhost:3000/api/v1/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `http://localhost:3000/api/v1/billing/cancel`,
+    success_url: `${APP_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${APP_URL}/billing/cancel`,
     metadata: {
       companyId: String(companyId),
       planId: String(planId),
@@ -45,7 +46,9 @@ const handleCheckoutCompleted = async (session) => {
     throw new AppError("Missing Stripe subscription in checkout session", 400);
   }
 
-  const subscription = await stripe.subscriptions.retrieve(session.subscription);
+  const subscription = await stripe.subscriptions.retrieve(
+    session.subscription,
+  );
   const firstItem = subscription?.items?.data?.[0];
   const priceId = firstItem?.price?.id || null;
 

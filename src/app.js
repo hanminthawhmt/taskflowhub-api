@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const apiRoutes = require("./routes/routes");
 const billingRoutes = require("./modules/billing/route");
+const billingController = require("./modules/billing/controller");
 const logger = require("./middleware/logger");
 const errorHandler = require("./middleware/erroHandler");
 const { swaggerSetup } = require("./config/swagger");
@@ -14,10 +15,16 @@ app.use(
   }),
 );
 
+app.post(
+  "/api/v1/billing/webhook",
+  express.raw({ type: "application/json" }),
+  billingController.handleStripeWebhook,
+);
+
 app.use(express.json());
-app.use("/api/v1/billing", billingRoutes);
 app.use(logger);
 swaggerSetup(app);
+app.use("/api/v1/billing", billingRoutes);
 app.use("/api/v1", apiRoutes);
 app.use(errorHandler);
 
