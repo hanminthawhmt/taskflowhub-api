@@ -4,6 +4,7 @@ const projectInviteTemplate = require("../../services/emailTemplates/projectInvi
 const sendMail = require("../../services/mailer");
 const AppError = require("../../util/appError");
 const activityLogService = require("../activity_log/service");
+const { APP_URL } = require("../../config/env");
 
 const listProjectsForCompany = async (companyId, userId) => {
   const projects = await projectRepo.findProjectsForCompanyAndUser(
@@ -102,7 +103,7 @@ const inviteMember = async ({
     });
   });
 
-  const acceptUrl = `http://localhost:3000/api/v1/companies/projects/invitations/${invitation.token}/accept`;
+  const acceptUrl = `${APP_URL}/invitations/project/${projectId}/${invitation.token}`;
 
   await sendMail({
     to: email,

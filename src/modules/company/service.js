@@ -6,6 +6,8 @@ const generateToken = require("../../util/generateToken");
 const authRepo = require("../auth/repository");
 const activityLogService = require("../activity_log/service");
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const AppError = require("../../util/appError");
+const { APP_URL } = require("../../config/env");
 
 const listCompaniesForUser = async (userId) => {
   const memberships = await companyRepo.findCompaniesForUser(userId);
@@ -46,7 +48,7 @@ const inviteMember = async ({
     });
   });
 
-  const acceptUrl = `http://localhost:3000/api/v1/companies/invitations/${invitation.token}/accept`;
+  const acceptUrl = `${APP_URL}/invitations/company/${invitation.token}`;
 
   await sendMail({
     to: email,
