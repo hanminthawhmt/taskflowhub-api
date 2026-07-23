@@ -10,7 +10,7 @@ const billingController = require("./controller");
 router.get("/plans", billingController.handleListPlans);
 
 router.post(
-  "/:companyId/checkout",
+  "/companies/:companyId/checkout",
   authenticate,
   checkCompanyMember,
   requirePermission("update_company_settings"),

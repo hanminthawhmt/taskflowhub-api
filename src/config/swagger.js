@@ -766,7 +766,7 @@ const swaggerSpec = {
         responses: { 200: { description: "Plans returned" } },
       },
     },
-    "/billing/{companyId}/checkout": {
+    "/billing/companies/{companyId}/checkout": {
       post: {
         tags: ["Billing"],
         summary: "Create a Stripe checkout session",
