@@ -1,4 +1,5 @@
 const taskRepo = require("./repository");
+const projectRepo = require("../project/repository");
 const AppError = require("../../util/appError");
 const activityLogService = require("../activity_log/service");
 
@@ -29,9 +30,10 @@ const createTask = async ({
       project_id,
       user_id,
     });
+    const project = await projectRepo.findById(project_id);
 
     await activityLogService.log({
-      companyId: null,
+      companyId: project?.companyId ?? null,
       projectId: task.projectId,
       userId: created_by,
       action: "task_created",
@@ -40,7 +42,6 @@ const createTask = async ({
       meta: {
         title: task.title,
         priority: task.priority,
-        status: task.status,
       },
     });
 
@@ -72,15 +73,16 @@ const updateStatus = async ({ taskId, userId, status }) => {
   const updated = await taskRepo.updateStatus(taskId, status);
 
   await activityLogService.log({
-    companyId: null,
+    companyId: project?.companyId ?? null,
     projectId: task.projectId,
     userId,
     action: "task_status_updated",
     subjectType: "task",
     subjectId: task.id,
-    meta: {
-      previousStatus: task.status,
+     meta: {
+      title: task.title,
       newStatus: status,
+      previousStatus: task.status, // worth adding — you have this for free before the update overwrites it
     },
   });
 
@@ -131,5 +133,5 @@ module.exports = {
   getMyTasks,
   updateStatus,
   listProjectTasks,
-  getUpcomingTasksForCompany
+  getUpcomingTasksForCompany,
 };

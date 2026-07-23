@@ -97,6 +97,7 @@ const handleUpdateProject = async (req, res, next) => {
     const project = await projectService.updateProjectSettings(
       Number(req.params.projectId),
       req.body,
+      req.user.userId,
     );
     res
       .status(200)
@@ -108,7 +109,10 @@ const handleUpdateProject = async (req, res, next) => {
 
 const handleDeleteProject = async (req, res, next) => {
   try {
-    await projectService.deleteProject(Number(req.params.projectId));
+    await projectService.deleteProject(
+      Number(req.params.projectId),
+      req.user.userId,
+    );
     res.status(200).json({ message: "Project deleted successfully" });
   } catch (error) {
     next(error);

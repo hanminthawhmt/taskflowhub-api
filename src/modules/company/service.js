@@ -239,12 +239,24 @@ const listCompanyMembers = async (companyId) => {
   }));
 };
 
-const updateCompanyName = async (id, name) => {
+const updateCompanyName = async (id, name, userId) => {
   const company = await companyRepo.findCompanyById(id);
   if (!company) {
     throw new AppError("Company not found", 404);
   }
-  return await companyRepo.updateCompanyName(company.id, name);
+  const updatedCompany = await companyRepo.updateCompanyName(company.id, name);
+
+  await activityLogService.log({
+    companyId: company.id,
+    projectId: null,
+    userId,
+    action: "company_updated",
+    subjectType: "company",
+    subjectId: company.id,
+    meta: { newName: name },
+  });
+
+  return updatedCompany;
 };
 
 const getCompanyStats = async (companyId, period) => {

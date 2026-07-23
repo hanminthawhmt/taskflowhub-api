@@ -70,8 +70,10 @@ const addProjectMembers = async ({ projectId, members, userId }) => {
     return projectRepo.addMembersInTransaction(tx, { projectId, members });
   });
 
+  const project = await projectRepo.findById(projectId);
+
   await activityLogService.log({
-    companyId: null,
+    companyId: project?.companyId ?? null,
     projectId,
     userId,
     action: "project_member_added",
@@ -188,7 +190,11 @@ const listProjectMembers = async (projectId) => {
   }));
 };
 
-const updateProjectSettings = async (projectId, { title, description }) => {
+const updateProjectSettings = async (
+  projectId,
+  { title, description },
+  userId,
+) => {
   const project = await projectRepo.getProjectById(projectId);
   if (!project) {
     throw new AppError("Project not found", 404);
@@ -198,14 +204,36 @@ const updateProjectSettings = async (projectId, { title, description }) => {
   if (title !== undefined) data.title = title;
   if (description !== undefined) data.description = description;
 
-  return projectRepo.updateProject(projectId, data);
+  const updatedProject = await projectRepo.updateProject(projectId, data);
+
+  await activityLogService.log({
+    companyId: project.companyId,
+    projectId: project.id,
+    userId,
+    action: "project_updated",
+    subjectType: "project",
+    subjectId: project.id,
+    meta: { changedFields: Object.keys(data) },
+  });
+
+  return updatedProject;
 };
 
-const deleteProject = async (projectId) => {
+const deleteProject = async (projectId, userId) => {
   const project = await projectRepo.getProjectById(projectId);
   if (!project) {
     throw new AppError("Project not found", 404);
   }
+
+  await activityLogService.log({
+    companyId: project.companyId,
+    projectId: project.id,
+    userId,
+    action: "project_deleted",
+    subjectType: "project",
+    subjectId: project.id,
+    meta: { title: project.title },
+  });
 
   return projectRepo.runTransaction(async (tx) => {
     return projectRepo.deleteProjectInTransaction(tx, projectId);

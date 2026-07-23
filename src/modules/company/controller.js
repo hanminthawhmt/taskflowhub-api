@@ -109,6 +109,7 @@ const handleUpdateCompanyName = async (req, res, next) => {
     const company = await companyService.updateCompanyName(
       Number(req.params.companyId),
       req.body.name,
+      req.user.userId,
     );
     res
       .status(200)
