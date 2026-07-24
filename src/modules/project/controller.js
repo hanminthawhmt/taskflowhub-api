@@ -119,6 +119,19 @@ const handleDeleteProject = async (req, res, next) => {
   }
 };
 
+const handleRemoveMember = async (req, res, next) => {
+  try {
+    await projectService.removeMember(
+      Number(req.params.projectId),
+      Number(req.params.userId),
+      req.user.userId,
+    );
+    res.status(200).json({ message: "Member removed successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleCreateProject,
   handleAddProjectMembers,
@@ -128,4 +141,5 @@ module.exports = {
   handleListProjectMembers,
   handleUpdateProject,
   handleDeleteProject,
+  handleRemoveMember,
 };

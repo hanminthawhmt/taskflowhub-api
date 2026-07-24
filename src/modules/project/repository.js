@@ -162,6 +162,16 @@ const checkMembership = (projectId, userId) => {
   return prisma.projectMember.findFirst({ where: { projectId, userId } });
 };
 
+const countProjectOwners = async (projectId, ownerRoleId) => {
+  return prisma.projectMember.count({
+    where: { projectId, roleId: ownerRoleId },
+  });
+};
+
+const removeMember = (membershipId) => {
+  return prisma.projectMember.delete({ where: { id: membershipId } });
+};
+
 module.exports = {
   createProjectInTransaction,
   addProjectMemberInTransaction,
@@ -176,5 +186,7 @@ module.exports = {
   findMembersForProject,
   updateProject,
   deleteProjectInTransaction,
-  checkMembership
+  checkMembership,
+  countProjectOwners,
+  removeMember,
 };

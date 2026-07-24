@@ -240,6 +240,41 @@ const deleteProject = async (projectId, userId) => {
   });
 };
 
+const removeMember = async (projectId, targetUserId, requestingUserId) => {
+  const membership = await projectRepo.checkMembership(projectId, targetUserId);
+  if (!membership) {
+    throw new AppError("This user is not a member of this project", 404);
+  }
+
+  const ownerRole = await roleService.getOwnerRole("Owner", "project");
+
+  if (membership.roleId === ownerRole.id) {
+    const ownerCount = await projectRepo.countProjectOwners(
+      projectId,
+      ownerRole.id,
+    );
+    if (ownerCount <= 1) {
+      throw new AppError(
+        "Cannot remove the last remaining Owner of a project",
+        400,
+      );
+    }
+  }
+
+  await projectRepo.removeMember(membership.id);
+
+  const project = await projectRepo.getProjectById(projectId);
+  await activityLogService.log({
+    companyId: project?.companyId ?? null,
+    projectId,
+    userId: requestingUserId,
+    action: "project_member_removed",
+    subjectType: "project_member",
+    subjectId: targetUserId,
+    meta: { removedUserId: targetUserId },
+  });
+};
+
 module.exports = {
   createProject,
   addProjectMembers,
@@ -250,4 +285,5 @@ module.exports = {
   listProjectMembers,
   updateProjectSettings,
   deleteProject,
+  removeMember,
 };

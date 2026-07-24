@@ -84,4 +84,13 @@ router.delete(
   projectController.handleDeleteProject,
 );
 
+router.delete(
+  "/companies/:companyId/projects/:projectId/members/:userId",
+  authenticate,
+  checkCompanyMember,
+  checkProjectMember,
+  requirePermission("remove_project_member"),
+  projectController.handleRemoveMember,
+);
+
 module.exports = router;
