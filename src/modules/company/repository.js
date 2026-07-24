@@ -192,6 +192,28 @@ const getTasksInDateRange = (companyId, from, to) => {
   });
 };
 
+const findPendingInvitations = (companyId) => {
+  return prisma.companyInvitation.findMany({
+    where: { companyId, status: "pending" },
+    include: {
+      role: true,
+      inviter: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+const findInvitationById = (id) => {
+  return prisma.companyInvitation.findUnique({ where: { id } });
+};
+
+const revokeInvitation = (id) => {
+  return prisma.companyInvitation.update({
+    where: { id },
+    data: { status: "cancelled" },
+  });
+};
+
 module.exports = {
   createCompanyAsOwner,
   createInvitation,
@@ -209,4 +231,7 @@ module.exports = {
   updateCompanyName,
   getCompanyStats,
   getTasksInDateRange,
+  findPendingInvitations,
+  findInvitationById,
+  revokeInvitation
 };

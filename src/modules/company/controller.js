@@ -144,6 +144,29 @@ const handleGetWeeklyActivity = async (req, res, next) => {
   }
 };
 
+const handleListPendingInvitations = async (req, res, next) => {
+  try {
+    const invitations = await companyService.listPendingInvitations(
+      Number(req.params.companyId),
+    );
+    res.status(200).json({ data: invitations });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleRevokeInvitation = async (req, res, next) => {
+  try {
+    await companyService.revokeInvitation(
+      Number(req.params.invitationId),
+      Number(req.params.companyId),
+    );
+    res.status(200).json({ message: "Invitation revoked" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleInviteMember,
   handleGetAllCompanies,
@@ -156,4 +179,6 @@ module.exports = {
   handleUpdateCompanyName,
   handleGetCompanyStats,
   handleGetWeeklyActivity,
+  handleListPendingInvitations,
+  handleRevokeInvitation
 };

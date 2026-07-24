@@ -335,6 +335,33 @@ const getWeeklyTaskActivity = async (companyId, fromParam, toParam) => {
   return buckets.map(({ dateKey, ...rest }) => rest); // drop internal dateKey from response
 };
 
+const listPendingInvitations = async (companyId) => {
+  const invitations = await companyRepo.findPendingInvitations(companyId);
+
+  return invitations.map((inv) => ({
+    id: inv.id,
+    email: inv.email,
+    roleId: inv.role.id,
+    roleTitle: inv.role.title,
+    invitedBy: inv.inviter,
+    expiresAt: inv.expiresAt,
+    createdAt: inv.createdAt,
+  }));
+};
+
+const revokeInvitation = async (invitationId, companyId) => {
+  const invitation = await companyRepo.findInvitationById(invitationId);
+
+  if (!invitation || invitation.companyId !== companyId) {
+    throw new AppError("Invitation not found", 404);
+  }
+  if (invitation.status !== "pending") {
+    throw new AppError("This invitation is no longer pending", 400);
+  }
+
+  return companyRepo.revokeInvitation(invitationId);
+};
+
 module.exports = {
   createCompany,
   inviteMember,
@@ -349,4 +376,6 @@ module.exports = {
   updateCompanyName,
   getCompanyStats,
   getWeeklyTaskActivity,
+  listPendingInvitations,
+  revokeInvitation
 };

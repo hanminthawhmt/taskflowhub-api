@@ -81,4 +81,20 @@ router.post(
 
 router.get("/invitations/:token", companyController.handleGetInvitationDetails);
 
+router.get(
+  "/:companyId/invitations",
+  authenticate,
+  checkCompanyMember,
+  requirePermission("invite_company_member"),
+  companyController.handleListPendingInvitations,
+);
+
+router.delete(
+  "/:companyId/invitations/:invitationId",
+  authenticate,
+  checkCompanyMember,
+  requirePermission("invite_company_member"),
+  companyController.handleRevokeInvitation,
+);
+
 module.exports = router;
