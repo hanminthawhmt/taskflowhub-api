@@ -85,11 +85,25 @@ const findUpcomingTasksForUser = (companyId, userId, lookaheadDate) => {
   });
 };
 
+const updateTask = async (taskId, data) => {
+  return await prisma.task.update({
+    where: { id: taskId },
+    data,
+  });
+};
+
+const deleteTask = (taskId) => {
+  return prisma.task.delete({ where: { id: taskId } });
+};
+
+
 module.exports = {
   createTask,
   findById,
   findMyTasksInProject,
   updateStatus,
   findAllTasksInProject,
-  findUpcomingTasksForUser
+  findUpcomingTasksForUser,
+  updateTask,
+  deleteTask
 };

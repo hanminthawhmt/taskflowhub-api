@@ -42,6 +42,23 @@ router.patch(
   taskController.handleUpdateTaskStatus,
 );
 
+router.patch(
+  "/:projectId/tasks/:taskId",
+  authenticate,
+  checkProjectMember,
+  requirePermission("update_any_task"),
+  validate(taskValidation.updateTaskSchema),
+  taskController.handleUpdateTask,
+);
+
+router.delete(
+  "/:projectId/tasks/:taskId",
+  authenticate,
+  checkProjectMember,
+  requirePermission("delete_task"),
+  taskController.handleDeleteTask,
+);
+
 router.get(
   "/companies/:companyId/tasks/upcoming",
   authenticate,

@@ -158,6 +158,10 @@ const deleteProjectInTransaction = async (tx, projectId) => {
   return tx.project.delete({ where: { id: projectId } });
 };
 
+const checkMembership = (projectId, userId) => {
+  return prisma.projectMember.findFirst({ where: { projectId, userId } });
+};
+
 module.exports = {
   createProjectInTransaction,
   addProjectMemberInTransaction,
@@ -172,4 +176,5 @@ module.exports = {
   findMembersForProject,
   updateProject,
   deleteProjectInTransaction,
+  checkMembership
 };

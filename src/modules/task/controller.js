@@ -79,10 +79,34 @@ const handleGetUpcomingTasks = async (req, res, next) => {
   }
 };
 
+const handleUpdateTask = async (req, res, next) => {
+  try {
+    const task = await taskService.updateTask(
+      Number(req.params.taskId),
+      req.body,
+      req.user.userId,
+    );
+    res.status(200).json({ message: "Task updated successfully", data: task });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const handleDeleteTask = async (req, res, next) => {
+  try {
+    await taskService.deleteTask(Number(req.params.taskId), req.user.userId);
+    res.status(200).json({ message: "Task deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleTaskCreate,
   handleGetMyTasks,
   handleUpdateTaskStatus,
   handleListProjectTasks,
   handleGetUpcomingTasks,
+  handleUpdateTask,
+  handleDeleteTask,
 };

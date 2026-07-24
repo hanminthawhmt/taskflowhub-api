@@ -127,6 +127,70 @@ const getUpcomingTasksForCompany = async (companyId, userId, days) => {
   }));
 };
 
+const updateTask = async (taskId, updates, userId) => {
+  const task = await taskRepo.findById(taskId);
+  if (!task) {
+    throw new AppError("Task not found", 404);
+  }
+
+  // if reassigning, validate the new assignee is a project member
+  if (updates.user_id !== undefined) {
+    const isMember = await projectRepo.checkMembership(
+      task.projectId,
+      updates.user_id,
+    );
+    if (!isMember) {
+      throw new AppError("Assigned user is not a member of this project", 400);
+    }
+  }
+
+  const data = {};
+  if (updates.title !== undefined) data.title = updates.title;
+  if (updates.description !== undefined) data.description = updates.description;
+  if (updates.priority !== undefined) data.priority = updates.priority;
+  if (updates.start_date !== undefined) data.startDate = updates.start_date;
+  if (updates.end_date !== undefined) data.endDate = updates.end_date;
+  if (updates.user_id !== undefined) data.userId = updates.user_id;
+
+  const updated = await taskRepo.updateTask(taskId, data);
+
+  const project = await projectRepo.getProjectById(task.projectId);
+  await activityLogService.log({
+    companyId: project?.companyId ?? null,
+    projectId: task.projectId,
+    userId,
+    action: "task_updated",
+    subjectType: "task",
+    subjectId: task.id,
+    meta: { changedFields: Object.keys(data) },
+  });
+
+  return updated;
+};
+
+const deleteTask = async (taskId, userId) => {
+  const task = await taskRepo.findById(taskId);
+  if (!task) {
+    throw new AppError("Task not found", 404);
+  }
+
+  const project = await projectRepo.getProjectById(task.projectId);
+
+  // log BEFORE deleting — same lesson as project deletion, the data
+  // won't exist to reference afterward
+  await activityLogService.log({
+    companyId: project?.companyId ?? null,
+    projectId: task.projectId,
+    userId,
+    action: "task_deleted",
+    subjectType: "task",
+    subjectId: task.id,
+    meta: { title: task.title },
+  });
+
+  return taskRepo.deleteTask(taskId);
+};
+
 module.exports = {
   createTask,
   getMyTasks,
@@ -134,4 +198,6 @@ module.exports = {
   updateStatus,
   listProjectTasks,
   getUpcomingTasksForCompany,
+  updateTask,
+  deleteTask,
 };
